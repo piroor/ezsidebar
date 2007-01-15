@@ -1,0 +1,130 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Ez Sidebar.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003-2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<!ENTITY ezsidebar.toggleShowHide.label  "侧边栏">
+
+<!ENTITY ezsidebar.show.label            "打开">
+<!ENTITY ezsidebar.hide.label            "关闭">
+<!ENTITY ezsidebar.addNewPanel.label     "添加新面板">
+<!ENTITY ezsidebar.addNewPanel.accesskey "A">
+<!ENTITY ezsidebar.addNewPanel.key       "P">
+<!ENTITY ezsidebar.reload.label          "重新载入">
+<!ENTITY ezsidebar.reload.accesskey      "R">
+
+<!ENTITY ezsidebar.edit.label            "编辑">
+<!ENTITY ezsidebar.edit.accesskey        "E">
+<!ENTITY ezsidebar.removePanel.label     "删除">
+<!ENTITY ezsidebar.removePanel.accesskey "D">
+<!ENTITY ezsidebar.renamePanel.label     "重命名">
+<!ENTITY ezsidebar.renamePanel.accesskey "R">
+<!ENTITY ezsidebar.setShortcut.label     "设置快捷键">
+<!ENTITY ezsidebar.setShortcut.accesskey "K">
+<!ENTITY ezsidebar.clearShortcut.label   "清除快捷键">
+<!ENTITY ezsidebar.clearShortcut.accesskey "C">
+
+
+<!ENTITY ezsidebar.addPanel.label         "将当前页添加到侧边栏">
+<!ENTITY ezsidebar.addPanel.accesskey     "T">
+<!ENTITY ezsidebar.addLinkPanel.label     "将此链接添加到侧边栏">
+<!ENTITY ezsidebar.addLinkPanel.accesskey "T">
+
+<!ENTITY ezsidebar.menu.label     "面板">
+
+
+
+
+<!ENTITY ezsidebar.add.title         "添加侧边栏面板">
+<!ENTITY ezsidebar.add.uri.label     "输入网址 (URL) 或指定想要添加的本地文件:">
+<!ENTITY ezsidebar.add.uri.accesskey "E">
+<!ENTITY ezsidebar.add.choose        "浏览...">
+<!ENTITY ezsidebar.add.choose.accesskey "C">
+<!ENTITY ezsidebar.add.title.label   "面板名:">
+<!ENTITY ezsidebar.add.title.accesskey "N">
+<!ENTITY ezsidebar.add.add           "添加">
+
+
+
+
+<!ENTITY ezsidebar.title               "侧边栏">
+<!ENTITY ezsidebar.titlemodifiermenuseparator " - ">
+
+<!ENTITY ezsidebar.functions.label     "偏好">
+
+<!ENTITY ezsidebar.undock.label        "浮动">
+<!ENTITY ezsidebar.dock.label          "锁定">
+<!ENTITY ezsidebar.alwaysRaised.label  "总在窗口最前面">
+
+<!ENTITY ezsidebar.collapse.label      "折叠侧边栏">
+<!ENTITY ezsidebar.expand.label        "展开侧边栏">
+<!ENTITY ezsidebar.autoCollapse.label  "自动折叠">
+
+<!ENTITY ezsidebar.autoClose.label     "随浏览器关闭">
+<!ENTITY ezsidebar.autoMinimize.label  "随浏览器最小化">
+<!ENTITY ezsidebar.hideOnStartup.label "启动时总是隐藏侧边栏">
+
+
+
+<!ENTITY ezsidebar.tabs.general   "常规">
+<!ENTITY ezsidebar.tabs.advanced  "高级">
+<!ENTITY ezsidebar.tabs.about     "关于">
+
+<!ENTITY ezsidebar.sidebar.caption    "侧边栏状态">
+
+<!ENTITY ezsidebar.behavior.caption   "状态">
+<!ENTITY ezsidebar.shortcut.switchSidebarPanel.label "使用 Alt-PageUp/Alt-PageDown 切换面板">
+<!ENTITY ezsidebar.overrideAddPanel.label "允许使用第三方面板 (需要重启动)">
+
+<!ENTITY ezsidebar.datasource.caption "外部源文件">
+<!ENTITY ezsidebar.datasource.label   "地址:">
+<!ENTITY ezsidebar.datasource.button  "浏览...">
+
+<!ENTITY ezsidebar.refresh.caption   "刷新固定面板">
+<!ENTITY ezsidebar.refresh.desc      "浮动侧边栏不能正确显示固定面板 (由扩展自动安装) 时，单击 &quot;刷新&quot;: ">
+<!ENTITY ezsidebar.refresh.button    "刷新">
+
+<!ENTITY ezsidebar.about.title       "Ez Sidebar 选项">
+<!ENTITY ezsidebar.about.caption     "版本信息">
+<!ENTITY ezsidebar.about.name_before "Ez Sidebar 版本:">
+<!ENTITY ezsidebar.about.name_after  "">
+<!ENTITY ezsidebar.about.destributed "http://piro.sakura.ne.jp/">
+
+<!ENTITY ezsidebar.OK                "完成">
+
+
+
+
+
+<!ENTITY ezsidebar.closeKey          "w">
+<!ENTITY ezsidebar.quitKey           "q">

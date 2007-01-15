@@ -1,0 +1,128 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is the Ez Sidebar.
+ *
+ * The Initial Developer of the Original Code is SHIMODA Hiroshi.
+ * Portions created by the Initial Developer are Copyright (C) 2003-2005
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+
+.menuitem-iconic[ezsidebar-item="true"] image {
+	max-width: 16px !important;
+	max-height: 16px !important;
+}
+
+
+#sidebar-splitter grippy {
+	visibility: collapse;
+}
+#sidebar-splitter[showgrippy="true"] grippy {
+	visibility: visible;
+}
+
+[windowtype="navigator:browser"] [ezsidebar-inSidebarWindow="true"],
+[windowtype="mozilla:sidebar"] [ezsidebar-inHostWindow="true"],
+[sidebar="shown"] [ezsidebar-id="ezsidebar:viewSidebarMenu:show"],
+[sidebar="hidden"] [ezsidebar-id="ezsidebar:viewSidebarMenu:hide"],
+[sidebarstate="docked"] [ezsidebar-id="ezsidebar:viewSidebarMenu:dock"],
+[sidebarstate="undocked"] [ezsidebar-id="ezsidebar:viewSidebarMenu:undock"],
+[sidebarcollapsed="true"] [ezsidebar-id="sidebarPanelPopup:collapse"],
+[sidebarcollapsed="false"] [ezsidebar-id="sidebarPanelPopup:expand"],
+[windowtype="mozilla:sidebar"] #context-addLinkSidebarPanel,
+[windowtype="mozilla:sidebar"] #context-addSidebarPanel {
+	display: none;
+}
+
+
+#sidebar-dock-button,
+#sidebar-undock-button,
+#sidebar-progressmeter
+{
+	display: -moz-box !important;
+}
+
+
+
+
+#sidebar-progressmeter
+{
+	min-width: 100%;
+	min-height: 100%;
+	width: 100%;
+	height: 100%;
+}
+
+
+
+#sidebar-dock-button,
+#sidebar-undock-button {
+	-moz-binding: url('chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton-image');
+}
+
+
+
+#ezsidebar-window #sidebar,
+#ezsidebar-window #sidebar-userdefined {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+
+[ezsidebar-menuType="panelsmenu"] [ezsidebar-inContextMenu="true"],
+[ezsidebar-menuType="contextmenu"] [ezsidebar-inPanelsMenu="true"] {
+	display: none !important;
+}
+
+
+#sidebar-box browser[collapsed="true"] {
+	-moz-user-focus: ignore;
+	-moz-user-select: none;
+	-moz-user-input: none;
+}
+
+
+
+/*
+	Hack for Optimoz Tweaks or others:
+
+	"display: none" (equals 'hidden="true"') prevents to initialize hidden
+	inline frames ("browser" widget) so I was used "visibility:collapse"
+	(equals'collapsed="true"') instead of it.
+	But some extensions only see "hidden" attribute. So, when Ez Sidebar is
+	installed, they were broken.
+	Now, I use "hidden" attribute isntead of "collapsed" attribute but
+	change the mean, "display:none" to "visibility:collapse".
+*/
+#sidebar-box[hidden="true"] {
+	display: -moz-box !important;
+	visibility: collapse !important;
+}

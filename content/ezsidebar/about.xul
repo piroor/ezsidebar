@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Ez Sidebar.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003-2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://communicator/skin/" type="text/css"?>
+<!DOCTYPE dialog [
+<!ENTITY % versionDTD SYSTEM "chrome://ezsidebar/content/_version.dtd">
+%versionDTD;
+<!ENTITY % ezsidebarDTD SYSTEM "chrome://ezsidebar/locale/">
+%ezsidebarDTD;
+]>
+<dialog xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		title="&ezsidebar.about.title;"
+		orient="vertical"
+		ondialogaccept="onAccept();"
+		ondialogcancel="window.close();"
+		buttons="accept,cancel"
+		onload="onLoad();">
+
+<script type="application/x-javascript" src="chrome://global/content/XPCNativeWrapper.js"/>
+<script type="application/x-javascript" src="chrome://ezsidebar/content/pXPCNativeWrapper.js"/>
+
+<script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
+<script type="application/x-javascript" src="chrome://ezsidebar/content/pRDFData.js"/>
+<script type="application/x-javascript"><![CDATA[
+
+
+function loadURI(uri)
+{
+	if (opener())
+		opener().loadURI(uri);
+	else
+		window.open(uri);
+}
+
+function onLoad() {
+	var ESS = EzSidebarService;
+
+	document.getElementById('alwaysRaised').checked = ESS.getPref('ezsidebar.alwaysRaised');
+	document.getElementById('autoCollapse').checked = ESS.getPref('ezsidebar.autoCollapse');
+	document.getElementById('autoClose').checked    = ESS.getPref('ezsidebar.autoClose');
+	document.getElementById('autoMinimize').checked = ESS.getPref('ezsidebar.sync_minimize_state.enabled');
+	document.getElementById('hideOnStartup').checked    = ESS.getPref('ezsidebar.hideOnStartup');
+
+	document.getElementById('ezsidebarDatasource').value = ESS.getPref('ezsidebar.datasource.file');
+	document.getElementById('overrideAddPanel').checked = ESS.getPref('ezsidebar.override.addPanelOperation');
+	document.getElementById('shortcut.switchSidebarPanel').checked = ESS.getPref('ezsidebar.shortcut.switchSidebarPanel.enabled');
+}
+
+function onAccept()
+{
+	updatePref('ezsidebar.alwaysRaised', document.getElementById('alwaysRaised').checked);
+	updatePref('ezsidebar.autoCollapse', document.getElementById('autoCollapse').checked);
+	updatePref('ezsidebar.autoClose', document.getElementById('autoClose').checked);
+	updatePref('ezsidebar.sync_minimize_state.enabled', document.getElementById('autoMinimize').checked);
+	updatePref('ezsidebar.hideOnStartup', document.getElementById('hideOnStartup').checked);
+
+	updatePref('ezsidebar.shortcut.switchSidebarPanel.enabled', document.getElementById('shortcut.switchSidebarPanel').checked);
+	updatePref('ezsidebar.override.addPanelOperation', document.getElementById('overrideAddPanel').checked);
+
+	updatePref('ezsidebar.datasource.file', document.getElementById('ezsidebarDatasource').value);
+
+	window.close();
+}
+
+function updatePref(aPrefName, aNewValue)
+{
+	if (EzSidebarService.getPref(aPrefName) != aNewValue)
+		EzSidebarService.setPref(aPrefName, aNewValue);
+}
+
+function doRefresh()
+{
+	EzSidebarService.staticPanels.clearData();
+	if (EzSidebarService.hostWindow) {
+		EzSidebarService.hostWindow.EzSidebarService.getStaticPanels();
+		if (EzSidebarService.sidebarWindow)
+			EzSidebarService.reopenSidebarWindow();
+	}
+	else if (EzSidebarService.sidebarWindow) {
+		EzSidebarService.sidebarWindow.close();
+	}
+}
+
+function chooseDatasource()
+{
+	var file = EzSidebarService.chooseFile(
+			msg.GetStringFromName('chooseDatasource_title'),
+			null,
+			[{
+				label   : msg.GetStringFromName('chooseDatasource_filter'),
+				pattern : '*.rdf'
+			}]
+		);
+	if (file)
+		document.getElementById('ezsidebarDatasource').value = file.path;
+}
+
+
+
+
+const WINMAN = Components.classes['@mozilla.org/appshell/window-mediator;1'].getService(Components.interfaces.nsIWindowMediator);
+function opener()
+{
+	return WINMAN.getMostRecentWindow('navigator:browser');
+}
+
+var STRBUNDLE = Components.classes['@mozilla.org/intl/stringbundle;1'].getService(Components.interfaces.nsIStringBundleService);
+var msg = STRBUNDLE.createBundle('chrome://ezsidebar/locale/ezsidebar.properties');
+
+]]></script>
+
+<tabbox>
+<tabs>
+	<tab label="&ezsidebar.tabs.general;"/>
+	<tab label="&ezsidebar.tabs.advanced;"/>
+	<tab label="&ezsidebar.tabs.about;"/>
+</tabs>
+<tabpanels>
+	<tabpanel orient="vertical">
+		<groupbox orient="vertical">
+			<caption label="&ezsidebar.sidebar.caption;"/>
+			<checkbox id="alwaysRaised"
+				label="&ezsidebar.alwaysRaised.label;"/>
+			<checkbox id="autoCollapse"
+				label="&ezsidebar.autoCollapse.label;"/>
+			<checkbox id="autoClose"
+				label="&ezsidebar.autoClose.label;"/>
+			<checkbox id="autoMinimize"
+				label="&ezsidebar.autoMinimize.label;"/>
+			<checkbox id="hideOnStartup"
+				label="&ezsidebar.hideOnStartup.label;"/>
+		</groupbox>
+	</tabpanel>
+	<tabpanel orient="vertical">
+		<groupbox orient="vertical">
+			<caption label="&ezsidebar.behavior.caption;"/>
+			<checkbox id="shortcut.switchSidebarPanel"
+				label="&ezsidebar.shortcut.switchSidebarPanel.label;"/>
+			<checkbox id="overrideAddPanel"
+				label="&ezsidebar.overrideAddPanel.label;"/>
+		</groupbox>
+
+		<groupbox orient="vertical">
+			<caption label="&ezsidebar.datasource.caption;"/>
+			<box orient="horizontal" align="center">
+				<label value="&ezsidebar.datasource.label;"
+					control="ezsidebarDatasource"/>
+				<textbox flex="1" style="min-width: 18em;" id="ezsidebarDatasource"/>
+				<button label="&ezsidebar.datasource.button;"
+					oncommand="chooseDatasource()"/>
+			</box>
+		</groupbox>
+
+		<groupbox orient="vertical">
+			<caption label="&ezsidebar.refresh.caption;"/>
+			<description style="max-width: 35em;" flex="1">&ezsidebar.refresh.desc;</description>
+			<box orient="horizontal" align="center">
+				<spacer flex="1"/>
+				<button flex="1" label="&ezsidebar.refresh.button;"
+					oncommand="doRefresh();"/>
+				<spacer flex="1"/>
+			</box>
+		</groupbox>
+	</tabpanel>
+	<tabpanel orient="vertical">
+		<groupbox orient="vertical">
+			<caption label="&ezsidebar.about.caption;"/>
+			<box orient="horizontal">
+				<spacer flex="1"/>
+				<description value="&ezsidebar.about.name_before;&version;&ezsidebar.about.name_after;"/>
+				<spacer flex="1"/>
+			</box>
+			<box orient="horizontal">
+				<spacer flex="1"/>
+				<description value="&ezsidebar.about.destributed;"
+					onclick="loadURI('http://piro.sakura.ne.jp/');"
+					class="text-link"/>
+				<spacer flex="1"/>
+			</box>
+		</groupbox>
+	</tabpanel>
+</tabpanels>
+</tabbox>
+
+</dialog>

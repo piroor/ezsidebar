@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Ez Sidebar.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2004
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<bindings id="ezsidebarBindings"
+	xmlns="http://www.mozilla.org/xbl"
+	xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:xbl="http://www.mozilla.org/xbl"
+	xmlns:html="http://www.w3.org/1999/xhtml">
+
+<binding id="dummy-browser" extends="xul:hbox">
+	<implementation>
+		<property name="mPrefs" readonly="true"
+			onget="return window.gBrowser.mPrefs;"/>
+		<property name="mTabBox"
+			onget="return window.gBrowser.mTabBox;"
+			onset="window.gBrowser.mTabBox = val; return val;"/>
+		<property name="mStrip"
+			onget="return window.gBrowser.mStrip;"
+			onset="window.gBrowser.mStrip = val; return val;"/>
+		<property name="mTabContainer"
+			onget="return window.gBrowser.mTabContainer;"
+			onset="window.gBrowser.mTabContainer = val; return val;"/>
+		<property name="mPanelContainer"
+			onget="return window.gBrowser.mPanelContainer;"
+			onset="window.gBrowser.mPanelContainer = val; return val;"/>
+		<property name="mStringBundle"
+			onget="return window.gBrowser.mStringBundle;"
+			onset="window.gBrowser.mStringBundle = val; return val;"/>
+		<property name="selectedTab"
+			onget="return window.gBrowser.selectedTab;"
+			onset="window.gBrowser.selectedTab = val; return val;"/>
+		<property name="mCurrentBrowser"
+			onget="return window.gBrowser.mCurrentBrowser;"
+			onset="window.gBrowser.mCurrentBrowser = val; return val;"/>
+		<property name="mProgressListeners"
+			onget="return window.gBrowser.mProgressListeners;"
+			onset="window.gBrowser.mProgressListeners = val; return val;"/>
+		<property name="mTabListeners"
+			onget="return window.gBrowser.mTabListeners;"
+			onset="window.gBrowser.mTabListeners = val; return val;"/>
+		<property name="mTabFilters"
+			onget="return window.gBrowser.mTabFilters;"
+			onset="window.gBrowser.mTabFilters = val; return val;"/>
+		<property name="mTabbedMode"
+			onget="return window.gBrowser.mTabbedMode;"
+			onset="window.gBrowser.mTabbedMode = val; return val;"/>
+		<property name="mIsBusy"
+			onget="return window.gBrowser.mIsBusy;"
+			onset="window.gBrowser.mIsBusy = val; return val;"/>
+		<property name="mMissedIconCache"
+			onget="return window.gBrowser.mMissedIconCache;"
+			onset="window.gBrowser.mMissedIconCache = val; return val;"/>
+		<property name="mContextTab"
+			onget="return window.gBrowser.mContextTab;"
+			onset="window.gBrowser.mContextTab = val; return val;"/>
+		<property name="tabContainer"
+			onget="return window.gBrowser.tabContainer;"/>
+		<property name="selectedTab"
+			onget="return window.gBrowser.selectedTab;"
+			onset="window.gBrowser.selectedTab = val; return val;"/>
+		<property name="selectedBrowser" readonly="true"
+			onget="return window.gBrowser.selectedBrowser;"/>
+		<property name="browsers" readonly="true"
+			onget="return window.gBrowser.browsers;"/>
+		<property name="canGoBack" readonly="true"
+			onget="return window.gBrowser.canGoBack;"/>
+		<property name="canGoForward" readonly="true"
+			onget="return window.gBrowser.canGoForward;"/>
+		<property name="homePage"
+			onget="return window.gBrowser.homePage;"
+			onset="window.gBrowser.homePage = val; return val;"/>
+		<property name="pageReport" readonly="true"
+			onget="return window.gBrowser.pageReport;"/>
+		<property name="currentURI" readonly="true"
+			onget="return window.gBrowser.currentURI;"/>
+		<property name="docShell" readonly="true"
+			onget="return window.gBrowser.docShell;"/>
+		<property name="webNavigation" readonly="true"
+			onget="return window.gBrowser.webNavigation;"/>
+		<property name="webBrowserFind" readonly="true"
+			onget="return window.gBrowser.webBrowserFind;"/>
+		<property name="webProgress" readonly="true"
+			onget="return window.gBrowser.webProgress;"/>
+		<property name="contentWindow" readonly="true"
+			onget="return window.gBrowser.contentWindow;"/>
+		<property name="sessionHistory" readonly="true"
+			onget="return window.gBrowser.sessionHistory;"/>
+		<property name="markupDocumentViewer" readonly="true"
+			onget="return window.gBrowser.markupDocumentViewer;"/>
+		<property name="contentViewerEdit" readonly="true"
+			onget="return window.gBrowser.contentViewerEdit;"/>
+		<property name="contentViewerFile" readonly="true"
+			onget="return window.gBrowser.contentViewerFile;"/>
+		<property name="documentCharsetInfo" readonly="true"
+			onget="return window.gBrowser.documentCharsetInfo;"/>
+		<property name="contentDocument" readonly="true"
+			onget="return window.gBrowser.contentDocument;"/>
+		<property name="securityUI" readonly="true"
+			onget="return window.gBrowser.securityUI;"/>
+		<property name="canFindAgain" readonly="true"
+			onget="return window.gBrowser.canFindAgain;"/>
+		<property name="userTypedValue"
+			onget="return window.gBrowser.userTypedValue;"
+			onset="window.gBrowser.userTypedValue = val; return val;"/>
+
+		<method name="mTabProgressListener">
+			<parameter name="aTab"/>
+			<parameter name="aBrowser"/>
+			<parameter name="aStartsBlank"/>
+			<body><![CDATA[ return window.gBrowser.mTabProgressListener(aTab, aBrowser, aStartsBlank); ]]></body>
+		</method>
+		<method name="buildFavIconString">
+			<parameter name="aURI"/>
+			<body><![CDATA[ return window.gBrowser.buildFavIconString(aURI); ]]></body>
+		</method>
+		<method name="shouldLoadFavIcon">
+			<parameter name="aURI"/>
+			<body><![CDATA[ return window.gBrowser.shouldLoadFavIcon(aURI); ]]></body>
+		</method>
+		<method name="loadFavIcon">
+			<parameter name="aURI"/>
+			<parameter name="aAttr"/>
+			<parameter name="aElt"/>
+			<body><![CDATA[ return window.gBrowser.loadFavIcon(aURI, aAttr, aElt); ]]></body>
+		</method>
+		<method name="addToMissedIconCache">
+			<parameter name="aURI"/>
+			<body><![CDATA[ return window.gBrowser.addToMissedIconCache(aURI); ]]></body>
+		</method>
+		<method name="openCacheEntry">
+			<parameter name="key"/>
+			<parameter name="access"/>
+			<body><![CDATA[ return window.gBrowser.openCacheEntry(key, access); ]]></body>
+		</method>
+		<method name="updateTitlebar">
+			<body><![CDATA[ return window.gBrowser.updateTitlebar(); ]]></body>
+		</method>
+		<method name="updateContextTab">
+			<parameter name="aEvent"/>
+			<body><![CDATA[ return window.gBrowser.updateContextTab(aEvent); ]]></body>
+		</method>
+		<method name="updatePopupMenu">
+			<parameter name="aPopupMenu"/>
+			<body><![CDATA[ return window.gBrowser.updatePopupMenu(aPopupMenu); ]]></body>
+		</method>
+		<method name="updateCurrentBrowser">
+			<body><![CDATA[ return window.gBrowser.updateCurrentBrowser(); ]]></body>
+		</method>
+		<method name="onTabClick">
+			<parameter name="event"/>
+			<body><![CDATA[ return window.gBrowser.onTabClick(event); ]]></body>
+		</method>
+		<method name="onLinkAdded">
+			<parameter name="event"/>
+			<body><![CDATA[ return window.gBrowser.onLinkAdded(event); ]]></body>
+		</method>
+		<method name="onTitleChanged">
+			<parameter name="evt"/>
+			<body><![CDATA[ return window.gBrowser.onTitleChanged(evt); ]]></body>
+		</method>
+		<method name="setTabTitle">
+			<parameter name="aTab"/>
+			<body><![CDATA[ return window.gBrowser.setTabTitle(aTab); ]]></body>
+		</method>
+		<method name="setStripVisibilityTo">
+			<parameter name="aShow"/>
+			<body><![CDATA[ return window.gBrowser.setStripVisibilityTo(aShow); ]]></body>
+		</method>
+		<method name="getStripVisibility">
+			<body><![CDATA[ return window.gBrowser.getStripVisibility(); ]]></body>
+		</method>
+		<method name="enterTabbedMode">
+			<body><![CDATA[ return window.gBrowser.enterTabbedMode(); ]]></body>
+		</method>
+		<method name="addTab">
+			<parameter name="aURI"/>
+			<parameter name="aReferrerURI"/>
+			<parameter name="aCharset"/>
+			<body><![CDATA[ return window.gBrowser.addTab(aURI, aReferrerURI, aCharset); ]]></body>
+		</method>
+		<method name="removeAllTabsBut">
+			<parameter name="aTab"/>
+			<body><![CDATA[ return window.gBrowser.removeAllTabsBut(aTab); ]]></body>
+		</method>
+		<method name="removeCurrentTab">
+			<body><![CDATA[ return window.gBrowser.removeCurrentTab(); ]]></body>
+		</method>
+		<method name="removeTab">
+			<parameter name="aTab"/>
+			<body><![CDATA[ return window.gBrowser.removeTab(aTab); ]]></body>
+		</method>
+		<method name="reloadAllTabs">
+			<body><![CDATA[ return window.gBrowser.reloadAllTabs(); ]]></body>
+		</method>
+		<method name="reloadTab">
+			<parameter name="aTab"/>
+			<body><![CDATA[ return window.gBrowser.reloadTab(aTab); ]]></body>
+		</method>
+		<method name="addProgressListener">
+			<parameter name="aListener"/>
+			<parameter name="aMask"/>
+			<body><![CDATA[ return window.gBrowser.addProgressListener(aListener, aMask); ]]></body>
+		</method>
+		<method name="removeProgressListener">
+			<parameter name="aListener"/>
+			<body><![CDATA[ return window.gBrowser.removeProgressListener(aListener); ]]></body>
+		</method>
+		<method name="getBrowserForTab">
+			<parameter name="aTab"/>
+			<body><![CDATA[ return window.gBrowser.getBrowserForTab(aTab); ]]></body>
+		</method>
+		<method name="onDragOver">
+			<parameter name="aEvent"/>
+			<parameter name="aFlavour"/>
+			<parameter name="aDragSession"/>
+			<body><![CDATA[ return window.gBrowser.onDragOver(aEvent, aFlavour, aDragSession); ]]></body>
+		</method>
+		<method name="onDrop">
+			<parameter name="aEvent"/>
+			<parameter name="aXferData"/>
+			<parameter name="aDragSession"/>
+			<body><![CDATA[ return window.gBrowser.onDrop(aEvent, aXferData, aDragSession); ]]></body>
+		</method>
+		<method name="getSupportedFlavours">
+			<body><![CDATA[ return window.gBrowser.getSupportedFlavours(); ]]></body>
+		</method>
+		<method name="goBack">
+			<body><![CDATA[ return window.gBrowser.goBack(); ]]></body>
+		</method>
+		<method name="goForward">
+			<body><![CDATA[ return window.gBrowser.goForward(); ]]></body>
+		</method>
+		<method name="reload">
+			<body><![CDATA[ return window.gBrowser.reload(); ]]></body>
+		</method>
+		<method name="reloadWithFlags">
+			<parameter name="aFlags"/>
+			<body><![CDATA[ return window.gBrowser.reloadWithFlags(aFlags); ]]></body>
+		</method>
+		<method name="stop">
+			<body><![CDATA[ return window.gBrowser.stop(); ]]></body>
+		</method>
+		<method name="loadURI">
+			<parameter name="aURI"/>
+			<parameter name="aReferrerURI"/>
+			<parameter name="aCharset"/>
+			<body><![CDATA[ return window.gBrowser.loadURI(aURI, aReferrerURI, aCharset); ]]></body>
+		</method>
+		<method name="loadURIWithFlags">
+			<parameter name="aURI"/>
+			<parameter name="aFlags"/>
+			<parameter name="aReferrerURI"/>
+			<parameter name="aCharset"/>
+			<body><![CDATA[ return window.gBrowser.loadURIWithFlags(aURI, aFlags, aReferrerURI, aCharset); ]]></body>
+		</method>
+		<method name="goHome">
+			<body><![CDATA[ return window.gBrowser.goHome(); ]]></body>
+		</method>
+		<method name="gotoIndex">
+			<parameter name="aIndex"/>
+			<body><![CDATA[ return window.gBrowser.gotoIndex(aIndex); ]]></body>
+		</method>
+		<method name="attachFormFill">
+			<body><![CDATA[ return window.gBrowser.attachFormFill(); ]]></body>
+		</method>
+		<method name="detachFormFill">
+			<body><![CDATA[ return window.gBrowser.detachFormFill(); ]]></body>
+		</method>
+		<method name="find">
+			<body><![CDATA[ return window.gBrowser.find(); ]]></body>
+		</method>
+		<method name="findAgain">
+			<body><![CDATA[ return window.gBrowser.findAgain(); ]]></body>
+		</method>
+		<method name="findPrevious">
+			<body><![CDATA[ return window.gBrowser.findPrevious(); ]]></body>
+		</method>
+	</implementation>
+</binding>
+
+</bindings>

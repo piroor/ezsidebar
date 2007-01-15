@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	 xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+	<Description about="urn:mozilla:install-manifest">
+
+		<em:id>{0EAF175C-0C46-4932-AB7D-F45D6C46F367}</em:id>
+
+		<em:version>3.1.2006011301</em:version>
+
+
+		<em:targetApplication>
+			<!-- Firefox -->
+			<Description>
+				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+				<em:minVersion>1.0</em:minVersion>
+				<em:maxVersion>1.5.0.*</em:maxVersion>
+			</Description>
+		</em:targetApplication>
+
+
+		<em:name>Ez Sidebar</em:name>
+		<em:description>Allows to take web pages into sidebar panels like Mozilla(Seamonkey), and provides undockable Sidebar.</em:description>
+		<em:creator>SHIMODA Hiroshi</em:creator>
+		<em:contributor>lenrock (Polish Language Pack)</em:contributor>
+		<em:contributor>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:contributor>
+		<em:contributor>Jean-Bernard Marcon (French Language Pack)</em:contributor>
+		<em:contributor>George C. Tsoi (Chinese(Simplified) Language Pack)</em:contributor>
+		<em:homepageURL>http://piro.sakura.ne.jp/xul/_ezsidebar.html.en</em:homepageURL>
+		<em:updateURL>http://piro.sakura.ne.jp/xul/xul.rdf.en</em:updateURL>
+
+
+		<em:optionsURL>chrome://ezsidebar/content/about.xul</em:optionsURL>
+		<em:aboutURL>chrome://ezsidebar/content/about.xul</em:aboutURL>
+		<em:iconURL>chrome://ezsidebar/content/icon.png</em:iconURL>
+
+
+		<em:file>
+			<Description about="urn:mozilla:extension:file:ezsidebar.jar">
+				<em:package>content/ezsidebar/</em:package>
+				<em:locale>locale/en-US/ezsidebar/</em:locale>
+				<em:locale>locale/ja-JP/ezsidebar/</em:locale>
+				<em:locale>locale/pl-PL/ezsidebar/</em:locale>
+				<em:locale>locale/es-ES/ezsidebar/</em:locale>
+				<em:locale>locale/fr-FR/ezsidebar/</em:locale>
+				<em:locale>locale/zh-CN/ezsidebar/</em:locale>
+				<em:skin>skin/classic/ezsidebar/</em:skin>
+			</Description>
+		</em:file>
+	</Description>
+</RDF>

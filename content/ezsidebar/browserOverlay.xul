@@ -1,0 +1,529 @@
+<?xml version="1.0"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Ez Sidebar.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003-2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
+<?xml-stylesheet href="chrome://ezsidebar/skin/ezsidebar.css" type="text/css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://ezsidebar/locale/">
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:ezsidebar="http://white.sakura.ne.jp/~piro/rdf#">
+
+<script type="application/x-javascript" src="chrome://global/content/XPCNativeWrapper.js"/>
+<script type="application/x-javascript" src="chrome://ezsidebar/content/pXPCNativeWrapper.js"/>
+
+<script type="application/x-javascript" src="chrome://ezsidebar/content/pImageLoader.js"/>
+<script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
+<script type="application/x-javascript" src="chrome://ezsidebar/content/pRDFData.js"/>
+
+<vbox id="sidebar-box"
+	ondraggesture="EzSidebarService.onDragDropEvent('startDrag', event);"
+	ondragover="EzSidebarService.onDragDropEvent('dragOver', event);"
+	ondragexit="EzSidebarService.onDragDropEvent('dragExit', event);"
+	ondragdrop="EzSidebarService.onDragDropEvent('drop', event);"
+	contextmenu="sidebar-panel-popup">
+	<box id="sidebar-userdeifned-box"
+		flex="1"
+		orient="vertical"
+		collapsed="true">
+		<browser id="sidebar-userdefined"
+			flex="1"
+			type="content"
+			contextmenu="contentAreaContextMenu"
+			contentcontextmenu="contentAreaContextMenu"
+			onclick="return contentAreaClick(event, true);"
+			autoscroll="true"
+			src="about:blank"/>
+	</box>
+	<menupopup id="sidebar-panel-popup"
+		label="&ezsidebar.menu.label;"
+		oncommand="this.hidePopup();"
+		onpopupshowing="EzSidebarService.initPopup(this);"
+		style="max-width: 24em;"
+		ezsidebar-menuType="panels">
+		<menuseparator ezsidebar-id="sidebarPanelPopup:separator"
+			ezsidebar-inPanelsMenu="true"/>
+		<menuitem
+			label="&ezsidebar.addNewPanel.label;"
+			accesskey="&ezsidebar.addNewPanel.label;"
+			oncommand="EzSidebarService.addNewPanel();"
+			key="ezsidebar:key:addNewPanel"/>
+		<menuitem
+			label="&ezsidebar.reload.label;"
+			accesskey="&ezsidebar.reload.label;"
+			oncommand="EzSidebarService.sidebar.reload();"/>
+
+		<menuseparator ezsidebar-inContextMenu="true"/>
+		<menuitem
+			label="&ezsidebar.renamePanel.label;"
+			accesskey="&ezsidebar.renamePanel.label;"
+			oncommand=" EzSidebarService.renameCurrentPanel();"
+			observes="ezsidebar:broadcaster:isUserDefined"
+			ezsidebar-inContextMenu="true"/>
+		<menuitem
+			label="&ezsidebar.removePanel.label;"
+			accesskey="&ezsidebar.removePanel.label;"
+			oncommand=" EzSidebarService.removeCurrentPanel();"
+			observes="ezsidebar:broadcaster:isUserDefined"
+			ezsidebar-inContextMenu="true"/>
+		<menuseparator ezsidebar-inContextMenu="true"/>
+		<menuitem
+			label="&ezsidebar.setShortcut.label;"
+			accesskey="&ezsidebar.setShortcut.label;"
+			oncommand="EzSidebarService.setKeyboardShortcutForCurrentPanel();"
+			observes="ezsidebar:broadcaster:isUserDefined"
+			ezsidebar-inContextMenu="true"/>
+		<menuitem
+			ezsidebar-id="sidebarPanelPopup:clearKey"
+			label="&ezsidebar.clearShortcut.label;"
+			accesskey="&ezsidebar.clearShortcut.label;"
+			oncommand="EzSidebarService.setKeyboardShortcutForCurrentPanel(true);"
+			observes="ezsidebar:broadcaster:isUserDefined"
+			ezsidebar-inContextMenu="true"/>
+
+		<menu label="&ezsidebar.edit.label;"
+			accesskey="&ezsidebar.edit.label;"
+			observes="ezsidebar:broadcaster:isUserDefined"
+			ezsidebar-inPanelsMenu="true">
+			<menupopup
+				oncommand="this.hidePopup();"
+				onpopupshowing="event.stopPropagation();"
+				onpopuphiding="event.stopPropagation();">
+				<menuitem
+					label="&ezsidebar.renamePanel.label;"
+					accesskey="&ezsidebar.renamePanel.label;"
+					oncommand=" EzSidebarService.renameCurrentPanel();"/>
+				<menuitem
+					label="&ezsidebar.removePanel.label;"
+					accesskey="&ezsidebar.removePanel.label;"
+					oncommand=" EzSidebarService.removeCurrentPanel();"/>
+				<menuseparator/>
+				<menuitem
+					label="&ezsidebar.setShortcut.label;"
+					accesskey="&ezsidebar.setShortcut.label;"
+					oncommand="EzSidebarService.setKeyboardShortcutForCurrentPanel();"/>
+				<menuitem
+					ezsidebar-id="sidebarPanelPopup:clearKey:submenu"
+					label="&ezsidebar.clearShortcut.label;"
+					accesskey="&ezsidebar.clearShortcut.label;"
+					oncommand="EzSidebarService.setKeyboardShortcutForCurrentPanel(true);"/>
+			</menupopup>
+		</menu>
+		<menuseparator/>
+		<menuitem ezsidebar-id="sidebarPanelPopup:dock"
+			ezsidebar-inSidebarWindow="true"
+			label="&ezsidebar.dock.label;"
+			oncommand="EzSidebarService.dock(this);"
+			class="menuitem-iconic"
+			image="chrome://ezsidebar/skin/dock.png"/>
+		<menuitem ezsidebar-id="sidebarPanelPopup:undock"
+			ezsidebar-inHostWindow="true"
+			label="&ezsidebar.undock.label;"
+			oncommand="EzSidebarService.undock(this);"
+			class="menuitem-iconic"
+			image="chrome://ezsidebar/skin/undock.png"/>
+		<menuitem ezsidebar-id="sidebarPanelPopup:collapse"
+			ezsidebar-inSidebarWindow="true"
+			label="&ezsidebar.collapse.label;"
+			oncommand="EzSidebarService.collapseExpand();"
+			observes="ezsidebar:broadcaster:collapseExpand"/>
+		<menuitem ezsidebar-id="sidebarPanelPopup:expand"
+			ezsidebar-inSidebarWindow="true"
+			label="&ezsidebar.expand.label;"
+			oncommand="EzSidebarService.collapseExpand();"
+			observes="ezsidebar:broadcaster:collapseExpand"/>
+		<menu label="&ezsidebar.functions.label;"
+			ezsidebar-inSidebarWindow="true">
+			<menupopup
+				oncommand="this.hidePopup();"
+				onpopupshowing="event.stopPropagation();"
+				onpopuphiding="event.stopPropagation();">
+				<menuitem label="&ezsidebar.alwaysRaised.label;"
+					oncommand="EzSidebarService.setAlwaysRaised(); EzSidebarService.updateSidebarWindowBroadcasters();"
+					observes="ezsidebar:broadcaster:alwaysRaised"/>
+				<menuitem ezsidebar-id="sidebarPanelPopup:autoCollapse"
+					label="&ezsidebar.autoCollapse.label;"
+					oncommand="EzSidebarService.setAutoCollapse(); EzSidebarService.updateSidebarWindowBroadcasters();"
+					observes="ezsidebar:broadcaster:autoCollapse"/>
+				<menuitem ezsidebar-id="sidebarPanelPopup:autoClose"
+					label="&ezsidebar.autoClose.label;"
+					oncommand="EzSidebarService.setAutoClose(); EzSidebarService.updateSidebarWindowBroadcasters();"
+					observes="ezsidebar:broadcaster:autoClose"/>
+				<menuitem ezsidebar-id="sidebarPanelPopup:autoMinimize"
+					label="&ezsidebar.autoMinimize.label;"
+					oncommand="EzSidebarService.setAutoMinimize(); EzSidebarService.updateSidebarWindowBroadcasters();"
+					observes="ezsidebar:broadcaster:autoMinimize"/>
+				<menuitem ezsidebar-id="sidebarPanelPopup:hideOnStartup"
+					label="&ezsidebar.hideOnStartup.label;"
+					oncommand="EzSidebarService.setHideOnStartup(); EzSidebarService.updateSidebarWindowBroadcasters();"
+					observes="ezsidebar:broadcaster:hideOnStartup"/>
+			</menupopup>
+		</menu>
+	</menupopup>
+	<data hidden="true">
+		<stack id="template:sidebar-title-stack" flex="1" align="center">
+			<hbox id="sidebar-progressmeter-box"
+				flex="1" align="center" collapsed="true">
+				<progressmeter id="sidebar-progressmeter" flex="1"
+					mode="normal" value="0"/>
+			</hbox>
+			<label id="template:sidebar-title" flex="1" crop="end"/>
+		</stack>
+		<toolbarbutton hidden="false"
+			id="template:sidebar-dock-button"
+			tooltiptext="&ezsidebar.dock.label;"
+			oncommand="EzSidebarService.dock();"/>
+		<toolbarbutton hidden="false"
+			id="template:sidebar-undock-button"
+			tooltiptext="&ezsidebar.undock.label;"
+			oncommand="EzSidebarService.undock();"/>
+	</data>
+</vbox>
+
+<broadcasterset id="mainBroadcasterSet">
+	<broadcasterset id="ezsidebarBroadcasterSet"
+		datasources="chrome://ezsidebar/content/ezsidebar.rdf"
+		ref="chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:root"
+		ezsidebar-datasource="EzSidebarService.panels">
+		<template ezsidebar-template="
+			function(aIndex, aObj)
+			{
+				var obj = EzSidebarService.panels;
+				var res = obj.item(aIndex);
+				return {
+						localName : 'broadcaster',
+						attr : {
+							uri                   : res.Value,
+							'ezsidebar-generated' : true,
+							'ezsidebar-id'        : 'ezsidebar:broadcaster:'+res.Value,
+							label                 : obj.getData(res, 'Name'),
+							autoCheck             : false,
+							type                  : 'checkbox',
+							group                 : 'sidebar',
+							sidebarurl            : obj.getData(res,'URL'),
+							image                 : obj.getData(res,'Icon')
+						}
+					};
+			}
+			">
+			<rule>
+				<conditions>
+					<content uri="?cont"/>
+					<member container="?cont" child="?name"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#URL" object="?panel"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Icon" object="?icon"/>
+				</conditions>
+				<bindings/>
+				<action>
+					<broadcaster uri="?name"
+						ezsidebar-generated="true"
+						ezsidebar-id="ezsidebar:broadcaster:?name"
+						label="?label"
+						autoCheck="false"
+						type="checkbox"
+						group="sidebar"
+						sidebarurl="?panel"
+						image="?icon"/>
+				</action>
+			</rule>
+		</template>
+	</broadcasterset>
+	<broadcaster id="ezsidebar:broadcaster:isUserDefined"/>
+	<broadcaster id="ezsidebar:broadcaster:collapseExpand"/>
+	<broadcaster id="ezsidebar:broadcaster:autoCollapse"
+		type="checkbox"/>
+	<broadcaster id="ezsidebar:broadcaster:autoClose"
+		type="checkbox"/>
+	<broadcaster id="ezsidebar:broadcaster:autoMinimize"
+		type="checkbox"/>
+	<broadcaster id="ezsidebar:broadcaster:hideOnStartup"
+		type="checkbox"/>
+	<broadcaster id="ezsidebar:broadcaster:alwaysRaised"
+		type="checkbox"/>
+</broadcasterset>
+
+<keyset id="mainKeyset">
+	<keyset id="ezsidebarKeySet"
+		datasources="chrome://ezsidebar/content/ezsidebar.rdf"
+		ref="chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:root"
+		ezsidebar-datasource="EzSidebarService.panels">
+		<template ezsidebar-template="
+			function(aIndex, aObj)
+			{
+				var obj = EzSidebarService.panels;
+				var res = obj.item(aIndex);
+				return (!obj.getData(res, 'Key') &amp;&amp; !obj.getData(res, 'Keycode')) ? {} :
+					obj.getData(res, 'Key') ?
+						{
+							localName : 'key',
+							attr : {
+								uri                   : res.Value,
+								'ezsidebar-generated' : true,
+								'ezsidebar-id'        : 'ezsidebar:key:'+res.Value,
+								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+res.Value,
+								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
+								'key'                 : obj.getData(res, 'Key'),
+								modifiers             : obj.getData(res, 'Modifiers')
+							}
+						} :
+					obj.getData(res, 'Keycode') ?
+						{
+							localName : 'key',
+							attr : {
+								uri                   : res.Value,
+								'ezsidebar-generated' : true,
+								'ezsidebar-id'        : 'ezsidebar:key:'+res.Value,
+								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+res.Value,
+								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
+								keycode               : obj.getData(res, 'Keycode'),
+								modifiers             : obj.getData(res, 'Modifiers')
+							}
+						} :
+					{};
+			}
+			">
+			<rule ezsidebar:Key="" ezsidebar:Keycode=""/>
+			<rule>
+				<conditions>
+					<content uri="?cont"/>
+					<member container="?cont" child="?name"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Key" object="?key"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
+				</conditions>
+				<bindings>
+					<binding subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Modifiers" object="?modifiers"/>
+				</bindings>
+				<action>
+					<key uri="?name"
+						ezsidebar-generated="true"
+						ezsidebar-id="ezsidebar:key:?name"
+						ezsidebar-observes="ezsidebar:broadcaster:?name"
+						oncommand="toggleSidebar(this.getAttribute('ezsidebar-observes'));"
+						key="?key" modifiers="?modifiers"/>
+				</action>
+			</rule>
+			<rule>
+				<conditions>
+					<content uri="?cont"/>
+					<member container="?cont" child="?name"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Keycode" object="?keycode"/>
+					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
+				</conditions>
+				<bindings>
+					<binding subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Modifiers" object="?modifiers"/>
+				</bindings>
+				<action>
+					<key uri="?name"
+						ezsidebar-generated="true"
+						ezsidebar-id="ezsidebar:key:?name"
+						ezsidebar-observes="ezsidebar:broadcaster:?name"
+						oncommand="toggleSidebar(this.getAttribute('ezsidebar-observes'));"
+						keycode="?keycode" modifiers="?modifiers"/>
+				</action>
+			</rule>
+			<rule/>
+		</template>
+	</keyset>
+	<key id="ezsidebar:key:toggleSidebar"
+		oncommand="toggleSidebar();"
+		keycode="VK_F9"/>
+	<key id="ezsidebar:key:addNewPanel"
+		oncommand="EzSidebarService.addNewPanel();"
+		key="&ezsidebar.addNewPanel.key;" modifiers="accel"/>
+</keyset>
+
+<menupopup id="viewSidebarMenu"
+	ondraggesture="EzSidebarService.onDragDropEvent('startDrag', event);"
+	ondragover="EzSidebarService.onDragDropEvent('dragOver', event);"
+	ondragexit="EzSidebarService.onDragDropEvent('dragExit', event);"
+	ondragdrop="EzSidebarService.onDragDropEvent('drop', event);"
+	style="max-width: 24em;">
+	<menu hidden="true">
+		<menupopup id="ezsidebar:viewSidebarMenu:mpopup"
+			datasources="chrome://ezsidebar/content/ezsidebar.rdf"
+			ref="chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:root"
+			ezsidebar-datasource="EzSidebarService.panels">
+			<template ezsidebar-template="
+				function(aIndex, aObj)
+				{
+					var obj = EzSidebarService.panels;
+					var res = obj.item(aIndex);
+					return {
+							localName : 'menuitem',
+							attr : {
+								uri                   : res.Value,
+								'ezsidebar-item'      : true,
+								'ezsidebar-generated' : true,
+								'ezsidebar-id'        : 'ezsidebar:broadcaster:'+res.Value,
+								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+res.Value,
+								'ezsidebar-key'       : 'ezsidebar:key:'+res.Value,
+								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
+								crop                  : 'end',
+								'class'               : 'menuitem-iconic'
+							}
+						};
+				}
+				">
+				<rule>
+					<conditions>
+						<content uri="?cont"/>
+						<member container="?cont" child="?name"/>
+						<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
+						<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#URL" object="?panel"/>
+					</conditions>
+					<bindings/>
+					<action>
+						<menuitem uri="?name"
+							crop="end"
+							ezsidebar-item="true"
+							ezsidebar-generated="true"
+							oncommand="toggleSidebar(this.getAttribute('ezsidebar-observes'));"
+							ezsidebar-key="ezsidebar:key:?name"
+							ezsidebar-id="ezsidebar:broadcaster:?name"
+							ezsidebar-observes="ezsidebar:broadcaster:?name"
+							class="menuitem-iconic"/>
+					</action>
+				</rule>
+			</template>
+		</menupopup>
+		<data>
+			<menuseparator ezsidebar-item="true"
+				ezsidebar-menubar-item="true"/>
+			<menuitem ezsidebar-item="true"
+				ezsidebar-menubar-item="true"
+				label="&ezsidebar.addNewPanel.label;"
+				oncommand="this.parentNode.hidePopup(); EzSidebarService.addNewPanel();"
+				key="ezsidebar:key:addNewPanel"/>
+			<menuitem ezsidebar-item="true"
+				ezsidebar-menubar-item="true"
+				ezsidebar-id="ezsidebar:viewSidebarMenu:show"
+				label="&ezsidebar.show.label;"
+				oncommand="toggleSidebar();"
+				key="ezsidebar:key:toggleSidebar"/>
+			<menuitem ezsidebar-item="true"
+				ezsidebar-menubar-item="true"
+				ezsidebar-id="ezsidebar:viewSidebarMenu:hide"
+				label="&ezsidebar.hide.label;"
+				oncommand="toggleSidebar();"
+				key="ezsidebar:key:toggleSidebar"/>
+			<menuseparator ezsidebar-item="true"
+				ezsidebar-menubar-item="true"/>
+			<menuitem ezsidebar-item="true"
+				ezsidebar-menubar-item="true"
+				ezsidebar-id="ezsidebar:viewSidebarMenu:dock"
+				label="&ezsidebar.dock.label;"
+				oncommand="EzSidebarService.dock(this);"
+				class="menuitem-iconic"
+				image="chrome://ezsidebar/skin/dock.png"/>
+			<menuitem ezsidebar-item="true"
+				ezsidebar-menubar-item="true"
+				ezsidebar-id="ezsidebar:viewSidebarMenu:undock"
+				label="&ezsidebar.undock.label;"
+				oncommand="EzSidebarService.undock(this);"
+				class="menuitem-iconic"
+				image="chrome://ezsidebar/skin/undock.png"/>
+		</data>
+	</menu>
+</menupopup>
+
+<popup id="contentAreaContextMenu">
+	<menuitem id="context-addLinkSidebarPanel"
+		insertafter="context-bookmarkpage"
+		label="&ezsidebar.addLinkPanel.label;"
+		accesskey="&ezsidebar.addLinkPanel.accesskey;"
+		oncommand="EzSidebarService.addPanel(('getLinkURI' in gContextMenu ? gContextMenu.linkURI : gContextMenu.linkURL() ), EzSidebarService.getInnerTextOf(gContextMenu.link));"/>
+	<menuitem id="context-addSidebarPanel"
+		insertafter="context-bookmarkpage"
+		label="&ezsidebar.addPanel.label;"
+		accesskey="&ezsidebar.addPanel.accesskey;"
+		oncommand="
+			var doc = (new XPCNativeWrapper(gContextMenu.target, 'ownerDocument')).ownerDocument;
+			EzSidebarService.addPanel(
+				(new XPCNativeWrapper(doc, 'URL')).URL,
+				(new XPCNativeWrapper(doc, 'title')).title
+		);"/>
+</popup>
+
+
+<popupset id="mainPopupSet">
+	<menupopup id="ezsidebar-toggle-button:contextmenu"
+		position="after_start"
+		context=""
+		tooltip=""
+		tooltiptext=""
+		oncommand="this.hidePopup(); this.shown = false;"
+		onpopupshowing="EzSidebarService.initPopup(this, 'panels');"
+		style="max-width: 24em;"
+		ezsidebar-menuType="panelsmenu">
+		<menuseparator hidden="true"
+			ezsidebar-id="sidebarPanelPopup:separator"
+			ezsidebar-inPanelsMenu="true"/>
+	</menupopup>
+</popupset>
+
+<toolbarpalette id="BrowserToolbarPalette">
+	<toolbarbutton id="ezsidebar-toggle-button"
+		label="&ezsidebar.toggleShowHide.label;"
+		tooltip=""
+		tooltiptext="&ezsidebar.toggleShowHide.label;"
+		oncommand="toggleSidebar();"
+		ondraggesture="EzSidebarService.onDragDropEvent('startDrag', event);"
+		ondragover="EzSidebarService.onDragDropEvent('dragOver', event);"
+		ondragexit="EzSidebarService.onDragDropEvent('dragExit', event);"
+		ondragdrop="EzSidebarService.onDragDropEvent('drop', event);"
+		class="toolbarbutton-1"
+		type="menu-button"
+		context="ezsidebar-toggle-button:contextmenu">
+		<menupopup id="ezsidebar-toggle-button:drowdownmenu"
+			position="after_start"
+			context=""
+			tooltip=""
+			tooltiptext=""
+			oncommand="this.hidePopup(); event.stopPropagation();"
+			onpopupshowing="EzSidebarService.initPopup(this);"
+			style="max-width: 24em;"
+			ezsidebar-menuType="panelsmenu">
+			<menuseparator hidden="true"
+				ezsidebar-id="sidebarPanelPopup:separator"
+				ezsidebar-inPanelsMenu="true"/>
+		</menupopup>
+	</toolbarbutton>
+</toolbarpalette>
+
+
+</overlay>

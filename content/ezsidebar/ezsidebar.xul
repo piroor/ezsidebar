@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is the Ez Sidebar.
+   -
+   - The Initial Developer of the Original Code is SHIMODA Hiroshi.
+   - Portions created by the Initial Developer are Copyright (C) 2003-2005
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://browser/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
+<?xml-stylesheet href="chrome://ezsidebar/content/ezsidebarBindings.css" type="text/css"?>
+
+<!--?xul-overlay href="chrome://global/content/globalOverlay.xul"?-->
+<?xul-overlay href="chrome://browser/content/browser.xul"?>
+
+<!DOCTYPE window SYSTEM "chrome://ezsidebar/locale/">
+
+<window id="ezsidebar-window"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		contenttitlesetting="true"
+		title="&ezsidebar.title;"
+		titlemodifier="&ezsidebar.title;"
+		titlemenuseparator="&ezsidebar.titlemodifiermenuseparator;"
+		windowtype="mozilla:sidebar"
+		orient="vertical"
+		width="225" height="450"
+		screenX="4" screenY="4"
+		persist="screenX screenY width height sizemode"
+		onload="ezsidebarUndockedStartup();"
+		onunload="ezsidebarUndockedShutdown();">
+
+<script type="application/x-javascript"><![CDATA[
+	try {
+		window.gBrowser = null;
+		window.content  = null;
+		window._content = null;
+	}
+	catch(e) {
+	}
+]]></script>
+
+
+<script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
+
+
+<script type="application/x-javascript" src="chrome://global/content/nsClipboard.js"/>
+<script type="application/x-javascript" src="chrome://global/content/strres.js"/>
+
+<script type="application/x-javascript" src="chrome://global/content/nsDragAndDrop.js"/>
+<script type="application/x-javascript" src="chrome://global/content/globalOverlay.js"/>
+<script type="application/x-javascript" src="chrome://browser/content/utilityOverlay.js"/>
+<script type="application/x-javascript" src="chrome://browser/content/bookmarks/bookmarks.js"/>
+<script type="application/x-javascript" src="chrome://browser/content/bookmarks/bookmarksMenu.js"/>
+<script type="application/x-javascript" src="chrome://browser/content/contentAreaUtils.js"/>
+<script type="application/x-javascript" src="chrome://browser/content/browser.js"/>
+
+
+<script type="application/x-javascript"><![CDATA[
+
+var XULBrowserWindow;
+var gProgressmeterPanel;
+
+function ezsidebarUndockedStartup()
+{
+	OverrideFunctions();
+
+	document.getElementById('sidebar').addEventListener('load', ezsidebarOverrideContentWindowPointerEventListener, true);
+
+	window.gNavigatorBundle = document.getElementById('bundle_browser');
+	window.gProgressMeterPanel = document.getElementById('statusbar-progresspanel');
+	window.gPrefService = EzSidebarService.Prefs;
+
+	EzSidebarService.setPref('ezsidebar.show', true);
+
+	window.setTimeout(
+		function()
+		{
+			var appCore;
+			try {
+				appCore = Components.classes['@mozilla.org/appshell/component/browser/instance;1'].createInstance(Components.interfaces.nsIBrowserInstance);
+				if (!appCore)
+					throw 'Ez Sidebar: couldn\'t create a browser instance';
+
+				if (!EzSidebarService.userSidebar.webNavigation)
+					throw 'Ez Sidebar: no XBL binding for browser';
+			} catch (e) {
+				alert('Ez Sidebar: Error launching browser window:' + e);
+				return;
+			}
+			appCore.setWebShellWindow(window);
+		},
+		0
+	);
+
+	EzSidebarService.ObserverService.notifyObservers(window, 'sidebarWindowCompletelyShown', null);
+
+//	Startup();
+}
+
+function ezsidebarUndockedShutdown()
+{
+	try {
+		if (EzSidebarService.hostWindow &&
+			!EzSidebarService.docked) {
+			EzSidebarService.setPref('ezsidebar.show', false);
+		}
+
+
+		OverrideFunctionsDestruct()
+		document.getElementById('sidebar').removeEventListener('load', ezsidebarOverrideContentWindowPointerEventListener, true);
+
+		if ('BrowserShutdown' in window)
+			BrowserShutdown();
+		else
+			Shutdown();
+	}
+	catch(e) {
+//		alert(e);
+	}
+
+	EzSidebarService.ObserverService.notifyObservers(window, 'sidebarWindowHidden', null);
+}
+
+]]></script>
+
+
+<stringbundleset id="stringbundleset"/>
+<command         id="mainCommandSet"/>
+<keyset          id="mainKeyset">
+	<key key="&ezsidebar.closeKey;" modifiers="accel"
+		oncommand="window.close();"/>
+	<key key="&ezsidebar.quitKey;" modifiers="accel"
+		oncommand="goQuitApplication();"/>
+</keyset>
+<broadcasterset  id="mainBroadcasterSet"/>
+<popupset        id="mainPopupSet"/>
+<menupopup       id="viewSidebarMenu"/>
+<popupset        id="contentAreaContextSet"/>
+
+<vbox id="sidebar-box" flex="1"
+	style="min-width: 150px; max-width: none;">
+	<sidebarheader align="center"
+		ondblclick="var header = EzSidebarService.getSidebarHeader(event); if (event.button == 0 &amp;&amp; header &amp;&amp; !EzSidebarService.autoCollapse) EzSidebarService.collapseExpand();">
+		<label id="sidebar-title"/>
+		<spacer flex="1"/>
+		<image id="sidebar-throbber"/>
+		<toolbarbutton class="tabs-closebutton"
+			oncommand="toggleSidebar();"/>
+	</sidebarheader>
+	<browser id="sidebar" flex="1"/>
+</vbox>
+
+<data hidden="true">
+	<splitter id="sidebar-splitter"/>
+	<statusbarpanel id="security-button"/>
+	<statusbarpanel id="statusbar-display"/>
+	<progressmeter id="statusbar-icon"/>
+	<button id="navigator-throbber"/>
+	<toolbox id="navigator-toolbox"/>
+	<statusbarpanel id="page-theme-button"/>
+	<statusbarpanel id="statusbar-progresspanel"/>
+	<progressmeter id="statusbar-icon"/>
+	<tabbrowser id="content"/>
+</data>
+
+
+<script type="application/x-javascript" src="chrome://ezsidebar/content/overrideFunctions.js"/>
+
+</window>
