@@ -9,7 +9,6 @@ var EzSidebarService =
 
 	sidebarHeight : 0,
 	autoCollapse  : false,
-	browserStatusHandler : null,
 	
 	// íËêî 
 	XULNS : 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
@@ -450,14 +449,9 @@ var EzSidebarService =
 		const nsIWebProgress = Components.interfaces.nsIWebProgress;
 		const flag = nsIWebProgress.NOTIFY_ALL;
 		aSidebar.sidebarProgressListener = this.sidebarProgressListener();
-		try {
-			aSidebar.sidebarProgressFilter = Components.classes['@mozilla.org/appshell/component/browser-status-filter;1'].createInstance(nsIWebProgress);
-			aSidebar.addProgressListener(aSidebar.sidebarProgressFilter, flag);
-			aSidebar.sidebarProgressFilter.addProgressListener(aSidebar.sidebarProgressListener, flag);
-		}
-		catch(e) {
-			aSidebar.addProgressListener(aSidebar.sidebarProgressListener, flag);
-		}
+		aSidebar.sidebarProgressFilter = Components.classes['@mozilla.org/appshell/component/browser-status-filter;1'].createInstance(nsIWebProgress);
+		aSidebar.addProgressListener(aSidebar.sidebarProgressFilter, flag);
+		aSidebar.sidebarProgressFilter.addProgressListener(aSidebar.sidebarProgressListener, flag);
 	},
   
 	// XPConnect 
@@ -1507,12 +1501,92 @@ var EzSidebarService =
 			this.userSidebar.historyInitialized = true;
 		}
 
-		if ('nsBrowserStatusHandler' in window &&
-			!this.browserStatusHandler) {
-			this.browserStatusHandler = new nsBrowserStatusHandler();
+		if (!this.browserStatusHandler) {
+			this.browserStatusHandler = this.crateBrowserStatusHandler();
 			this.userSidebar.addProgressListener(this.browserStatusHandler, Components.interfaces.nsIWebProgress.NOTIFY_ALL);
 		}
 	},
+	crateBrowserStatusHandler : function()
+	{
+		return {
+			stopCommand            : document.getElementById('Browser:Stop'),
+			reloadCommand          : document.getElementById('Browser:Reload'),
+			reloadSkipCacheCommand : document.getElementById('Browser:ReloadSkipCache'),
+			isImage                : document.getElementById('isImage'),
+			browser                : this.userSidebar,
+
+			QueryInterface : function(aIID)
+			{
+				if (aIID.equals(Components.interfaces.nsIWebProgressListener) ||
+					aIID.equals(Components.interfaces.nsISupportsWeakReference) ||
+					aIID.equals(Components.interfaces.nsISupports))
+					return this;
+				throw Components.results.NS_NOINTERFACE;
+			},
+
+			onProgressChange : function (aWebProgress, aRequest,
+										aCurSelfProgress, aMaxSelfProgress,
+										aCurTotalProgress, aMaxTotalProgress)
+			{
+			},
+
+			onStateChange : function(aWebProgress, aRequest, aStateFlags, aStatus)
+			{
+				const nsIWebProgressListener = Components.interfaces.nsIWebProgressListener;
+				const nsIChannel = Components.interfaces.nsIChannel;
+				if (aStateFlags & nsIWebProgressListener.STATE_START) {
+					this.stopCommand.removeAttribute('disabled');
+				}
+				else if (aStateFlags & nsIWebProgressListener.STATE_STOP) {
+					if (aRequest) {
+						if (this.browser.contentDocument &&
+							this.mimeTypeIsTextBased(this.browser.contentDocument.contentType))
+							this.isImage.removeAttribute('disabled');
+						else
+							this.isImage.setAttribute('disabled', true);
+					}
+					this.stopCommand.setAttribute('disabled', true);
+				}
+			},
+
+			onLocationChange : function(aWebProgress, aRequest, aLocation)
+			{
+				if (this.browser.contentDocument &&
+					this.mimeTypeIsTextBased(this.browser.contentDocument.contentType))
+					this.isImage.removeAttribute('disabled');
+				else
+					this.isImage.setAttribute('disabled', true);
+
+				if (aWebProgress.DOMWindow == content) {
+					var location = aLocation.spec;
+					if (location == 'about:blank' || location == '') {
+						this.reloadCommand.setAttribute('disabled', true);
+						this.reloadSkipCacheCommand.setAttribute('disabled', true);
+					} else {
+						this.reloadCommand.removeAttribute('disabled');
+						this.reloadSkipCacheCommand.removeAttribute('disabled');
+					}
+				}
+			},
+
+			mimeTypeIsTextBased : function(contentType)
+			{
+				return /^text\/|\+xml$/.test(contentType) ||
+					contentType == "application/x-javascript" ||
+					contentType == "application/xml" ||
+					contentType == "mozilla.application/cached-xul";
+			},
+
+			onStatusChange : function(aWebProgress, aRequest, aStatus, aMessage)
+			{
+			},
+
+			onSecurityChange : function(aWebProgress, aRequest, aState)
+			{
+			}
+		};
+	},
+	browserStatusHandler : null,
   
 	// dock/undock 
 	
@@ -2449,7 +2523,16 @@ var EzSidebarService =
 		this.windowIsClosing = true;
 
 		if (this.userSidebar && this.browserStatusHandler) {
-			this.userSidebar.removeProgressListener(this.browserStatusHandler);
+			try {
+				this.userSidebar.removeProgressListener(this.browserStatusHandler);
+			}
+			catch(e) {
+			}
+			this.browserStatusHandler.stopCommand = null;
+			this.browserStatusHandler.reloadCommand = null;
+			this.browserStatusHandler.reloadSkipCacheCommand = null;
+			this.browserStatusHandler.isImage = null;
+			this.browserStatusHandler.browser = null;
 			this.browserStatusHandler = null;
 		}
 
@@ -2470,24 +2553,13 @@ var EzSidebarService =
 		}
 
 		if (this.sidebarBox) {
-			try {
-				const nsIWebProgress = Components.interfaces.nsIWebProgress;
-				const flag = nsIWebProgress.NOTIFY_ALL;
-
-				if ('sidebarProgressListener' in this.staticSidebar) {
-					this.staticSidebar.removeProgressListener(this.staticSidebar.sidebarProgressFilter, flag);
-					this.staticSidebar.sidebarProgressFilter.removeProgressListener(this.staticSidebar.sidebarProgressListener, flag);
-				}
-				if ('sidebarProgressListener' in this.userSidebar) {
-					this.userSidebar.removeProgressListener(this.staticSidebar.sidebarProgressFilter, flag);
-					this.userSidebar.sidebarProgressFilter.removeProgressListener(this.userSidebar.sidebarProgressListener, flag);
-				}
+			if ('sidebarProgressListener' in this.staticSidebar) {
+				this.staticSidebar.sidebarProgressFilter.removeProgressListener(this.staticSidebar.sidebarProgressListener);
+				this.staticSidebar.removeProgressListener(this.staticSidebar.sidebarProgressFilter);
 			}
-			catch(e) {
-				if ('sidebarProgressListener' in this.staticSidebar)
-					this.staticSidebar.removeProgressListener(this.staticSidebar.sidebarProgressListener, flag);
-				if ('sidebarProgressListener' in this.userSidebar)
-					this.userSidebar.removeProgressListener(this.userSidebar.sidebarProgressListener, flag);
+			if ('sidebarProgressListener' in this.userSidebar) {
+				this.userSidebar.sidebarProgressFilter.removeProgressListener(this.userSidebar.sidebarProgressListener);
+				this.userSidebar.removeProgressListener(this.userSidebar.sidebarProgressFilter);
 			}
 			this.datasource.RemoveObserver(this.RDFObserver);
 		}

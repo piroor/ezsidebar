@@ -5,7 +5,6 @@
 <?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
 <?xml-stylesheet href="chrome://ezsidebar/content/ezsidebarBindings.css" type="text/css"?>
 
-<!--?xul-overlay href="chrome://global/content/globalOverlay.xul"?-->
 <?xul-overlay href="chrome://browser/content/browser.xul"?>
 
 <!DOCTYPE window SYSTEM "chrome://ezsidebar/locale/">
@@ -25,32 +24,13 @@
 		onunload="ezsidebarUndockedShutdown();">
 
 <script type="application/x-javascript"><![CDATA[
-	try {
-		window.gBrowser = null;
-		window.content  = null;
-		window._content = null;
-	}
-	catch(e) {
-	}
-]]></script>
-
-
-<script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
-
-
-<script type="application/x-javascript" src="chrome://global/content/nsClipboard.js"/>
-<script type="application/x-javascript" src="chrome://global/content/strres.js"/>
-
-<script type="application/x-javascript" src="chrome://global/content/nsDragAndDrop.js"/>
-<script type="application/x-javascript" src="chrome://global/content/globalOverlay.js"/>
-<script type="application/x-javascript" src="chrome://browser/content/utilityOverlay.js"/>
-<script type="application/x-javascript" src="chrome://browser/content/bookmarks/bookmarks.js"/>
-<script type="application/x-javascript" src="chrome://browser/content/bookmarks/bookmarksMenu.js"/>
-<script type="application/x-javascript" src="chrome://browser/content/contentAreaUtils.js"/>
-<script type="application/x-javascript" src="chrome://browser/content/browser.js"/>
-
-
-<script type="application/x-javascript"><![CDATA[
+try {
+	window.gBrowser = null;
+	window.content  = null;
+	window._content = null;
+}
+catch(e) {
+}
 
 var XULBrowserWindow;
 var gProgressmeterPanel;

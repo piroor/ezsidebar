@@ -1,3 +1,4 @@
+
 function OverrideFunctions()
 {
 	ezsidebarOverrideContentWindowPointer(window);
@@ -32,11 +33,14 @@ function OverrideFunctions()
 	};
 
 	if (window.openNewTabWith.toString().match(/navigator:browser/))
-		window.openNewTabWith = function(aURI)
+		window.openNewTabWith = function(aURI, aSourceURI)
 		{
 			if (EzSidebarService.windowIsClosing) return;
 
-			urlSecurityCheck(aURI, document);
+			if (urlSecurityCheck.toSource().indexOf('sourceURL') > -1)
+				urlSecurityCheck(aURI, aSourceURI);
+			else
+				urlSecurityCheck(aURI, document);
 
 			var browser = EzSidebarService.hostWindow;
 			if (!browser) {
