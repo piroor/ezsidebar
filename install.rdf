@@ -13,7 +13,7 @@
 			<Description>
 				<em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
 				<em:minVersion>1.0</em:minVersion>
-				<em:maxVersion>1.5.0.*</em:maxVersion>
+				<em:maxVersion>2.0.0.*</em:maxVersion>
 			</Description>
 		</em:targetApplication>
 
@@ -21,10 +21,10 @@
 		<em:name>Ez Sidebar</em:name>
 		<em:description>Allows to take web pages into sidebar panels like Mozilla(Seamonkey), and provides undockable Sidebar.</em:description>
 		<em:creator>SHIMODA Hiroshi</em:creator>
-		<em:contributor>lenrock (Polish Language Pack)</em:contributor>
-		<em:contributor>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:contributor>
-		<em:contributor>Jean-Bernard Marcon (French Language Pack)</em:contributor>
-		<em:contributor>George C. Tsoi (Chinese(Simplified) Language Pack)</em:contributor>
+		<em:translator>lenrock (Polish Language Pack)</em:translator>
+		<em:translator>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:translator>
+		<em:translator>Jean-Bernard Marcon (French Language Pack)</em:translator>
+		<em:translator>George C. Tsoi (Chinese(Simplified) Language Pack)</em:translator>
 		<em:homepageURL>http://piro.sakura.ne.jp/xul/_ezsidebar.html.en</em:homepageURL>
 		<em:updateURL>http://piro.sakura.ne.jp/xul/xul.rdf.en</em:updateURL>
 
