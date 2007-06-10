@@ -2167,8 +2167,9 @@ var EzSidebarService =
 				bar.currentSet = newset;
 				bar.setAttribute('currentset', newset);
 				document.persist(bar.id, 'currentset');
-				BrowserToolboxCustomizeDone(true);
 			}
+			if ('BrowserToolboxCustomizeDone' in window)
+				window.setTimeout('BrowserToolboxCustomizeDone(true);', 0);
 		}
 	},
 	
