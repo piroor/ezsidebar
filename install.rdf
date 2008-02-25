@@ -24,12 +24,14 @@
     <em:localized>
       <RDF:Description em:locale="en-US"
                        em:name="Ez Sidebar"
-                       em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."/>
+                       em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."
+                       em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html.en"/>
     </em:localized>
     <em:localized>
       <RDF:Description em:locale="ja-JP"
                        em:name="イージーSidebar"
-                       em:description="好きなページをサイドバーパネルに登録したり、サイドバーを別ウィンドウに分離したりできるようにします。"/>
+                       em:description="好きなページをサイドバーパネルに登録したり、サイドバーを別ウィンドウに分離したりできるようにします。"
+                       em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html"/>
     </em:localized>
 
 
