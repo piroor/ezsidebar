@@ -32,6 +32,7 @@
 	list-style-image: url('chrome://ezsidebar/skin/undock-active.png');
 }
 
+/*
 #sidebar-dock-button:hover,
 #sidebar-undock-button:hover {
 	border: 1px -moz-bg-outset;
@@ -43,6 +44,7 @@
 	border: 1px -moz-bg-inset;
 	margin: 0;
 }
+*/
 
 
 menuitem[dragover-top="true"] {

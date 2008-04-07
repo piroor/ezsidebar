@@ -101,12 +101,18 @@ function OverrideFunctionsDestruct()
 	function nullFunc() { return null; }
 
 	window.__proto__.__defineGetter__('_content', nullFunc);
+	window.__proto__.__defineSetter__('_content', nullFunc);
 	window.__proto__.__defineGetter__('content', nullFunc);
+	window.__proto__.__defineSetter__('content', nullFunc);
 	window.__proto__.__defineGetter__('_content.frames', nullFunc);
+	window.__proto__.__defineSetter__('_content.frames', nullFunc);
 
 	window.__defineGetter__('_content', nullFunc);
+	window.__defineSetter__('_content', nullFunc);
 	window.__defineGetter__('content', nullFunc);
+	window.__defineSetter__('content', nullFunc);
 	window.__defineGetter__('_content.frames', nullFunc);
+	window.__defineSetter__('_content.frames', nullFunc);
 
 
 	window.__proto__.__defineGetter__('gBrowser', nullFunc);
@@ -126,6 +132,17 @@ function ezsidebarGBrowserGetter()
 	return EzSidebarService.hostWindow ? EzSidebarService.hostWindow.gBrowser :
 			!EzSidebarService.windowIsClosing ? window.openDialog(EzSidebarService.browserURI, '_blank', 'chrome,all,dialog=no') :
 			null ;
+}
+
+function ezsidebarGetHostWindow()
+{
+	var contentWindow = EzSidebarService.hostWindow;
+	if (contentWindow) {
+		return contentWindow;
+	}
+	else {
+		return null;
+	}
 }
 
 function ezsidebarGetContent()
@@ -154,6 +171,7 @@ function ezsidebarGetContent()
 				contentWindow.framesSum.push(window.frames[i]);
 
 			contentWindow.__defineGetter__('frames', function() { return this.framesSum; });
+			contentWindow.__defineSetter__('frames', ezsidebarDummyFunc);
 		}
 	}
 	catch(e) {
@@ -185,11 +203,25 @@ function ezsidebarGetFrames()
 function ezsidebarOverrideContentWindowPointer(aWindow)
 {
 	aWindow.__proto__.__defineGetter__('_content', ezsidebarGetContent);
+	aWindow.__proto__.__defineSetter__('_content', ezsidebarDummyFunc);
 	aWindow.__proto__.__defineGetter__('content', ezsidebarGetContent);
+	aWindow.__proto__.__defineSetter__('content', ezsidebarDummyFunc);
 	aWindow.__proto__.__defineGetter__('_content.frames', ezsidebarGetFrames);
+	aWindow.__proto__.__defineSetter__('_content.frames', ezsidebarDummyFunc);
 	aWindow.__defineGetter__('_content', ezsidebarGetContent);
+	aWindow.__defineSetter__('_content', ezsidebarDummyFunc);
 	aWindow.__defineGetter__('content', ezsidebarGetContent);
+	aWindow.__defineSetter__('content', ezsidebarDummyFunc);
 	aWindow.__defineGetter__('_content.frames', ezsidebarGetFrames);
+	aWindow.__defineSetter__('_content.frames', ezsidebarDummyFunc);
+	aWindow.__proto__.__defineGetter__('top', ezsidebarGetHostWindow);
+	aWindow.__proto__.__defineSetter__('top', ezsidebarDummyFunc);
+	aWindow.__proto__.__defineGetter__('parent', ezsidebarGetHostWindow);
+	aWindow.__proto__.__defineSetter__('parent', ezsidebarDummyFunc);
+	aWindow.__defineGetter__('top', ezsidebarGetHostWindow);
+	aWindow.__defineSetter__('top', ezsidebarDummyFunc);
+	aWindow.__defineGetter__('parent', ezsidebarGetHostWindow);
+	aWindow.__defineSetter__('parent', ezsidebarDummyFunc);
 }
 function ezsidebarOverrideContentWindowPointerEventListener(aEvent)
 {
@@ -225,14 +257,32 @@ try {
 		__defineSetter__('gBrowser', ezsidebarDummyFunc);
 
 		__defineGetter__('_content', ezsidebarGetContent);
+		__defineSetter__('_content', ezsidebarDummyFunc);
 		__defineGetter__('content', ezsidebarGetContent);
+		__defineSetter__('content', ezsidebarDummyFunc);
 		__defineGetter__('_content.frames', ezsidebarGetFrames);
+		__defineSetter__('_content.frames', ezsidebarDummyFunc);
 
 		__proto__.__defineGetter__('_content', ezsidebarGetContent);
+		__proto__.__defineSetter__('_content', ezsidebarDummyFunc);
 		__proto__.__defineGetter__('content', ezsidebarGetContent);
+		__proto__.__defineSetter__('content', ezsidebarDummyFunc);
 		__proto__.__defineGetter__('_content.frames', ezsidebarGetFrames);
+		__proto__.__defineSetter__('_content.frames', ezsidebarDummyFunc);
+
+		__defineGetter__('top', ezsidebarGetHostWindow);
+		__defineSetter__('top', ezsidebarDummyFunc);
+		__defineGetter__('parent', ezsidebarGetHostWindow);
+		__defineSetter__('parent', ezsidebarDummyFunc);
+
+		__proto__.__defineGetter__('top', ezsidebarGetHostWindow);
+		__proto__.__defineSetter__('top', ezsidebarDummyFunc);
+		__proto__.__defineGetter__('parent', ezsidebarGetHostWindow);
+		__proto__.__defineSetter__('parent', ezsidebarDummyFunc);
 	}
 }
 catch(e) {
 }
+
+window.BrowserToolboxCustomizeDone = ezsidebarDummyFunc;
 
