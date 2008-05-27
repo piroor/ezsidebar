@@ -2157,7 +2157,7 @@ var EzSidebarService =
 			var newset = buttons.join(',');
 			if (currentset != newset &&
 				this.PromptService.confirmEx(
-					window,
+					null,
 					this.strbundle.GetStringFromName('initialshow_confirm_title'),
 					this.strbundle.GetStringFromName('initialshow_confirm_text'),
 					(this.PromptService.BUTTON_TITLE_YES * this.PromptService.BUTTON_POS_0) +
