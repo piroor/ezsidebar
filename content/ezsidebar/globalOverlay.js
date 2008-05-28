@@ -280,7 +280,7 @@ var EzSidebarService =
 					.QueryInterface(Components.interfaces.nsIDocShell);
 
 		if (!aRootDocShell)
-			aRootDocShell = gBrowser.docShell;
+			aRootDocShell = window.gBrowser.docShell;
 
 		aRootDocShell = aRootDocShell
 				.QueryInterface(kDSTreeNode)
@@ -1139,9 +1139,9 @@ var EzSidebarService =
 	
 	addNewPanel : function() 
 	{
-		var doc = gBrowser.contentDocument;
+		var doc = window.gBrowser.contentDocument;
 		var data = {
-				uri   : (this.hostWindow ? Components.lookupMethod(doc, 'URL').call(doc) : null ),
+				uri   : (this.hostWindow ? window.gBrowser.currentURI.spec : null ),
 				title : (this.hostWindow ? Components.lookupMethod(doc, 'title').call(doc) : null ),
 				add   : false
 			};
@@ -1969,6 +1969,8 @@ var EzSidebarService =
 		}
 		if (this.activated) return;
 		this.activated = true;
+
+		if (!this.sidebarBox) return; // not browser, not sidebar
 
 
 		var nullPointer;
