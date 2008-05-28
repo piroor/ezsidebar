@@ -1161,6 +1161,7 @@ var EzSidebarService =
  
 	setFavIconFor : function(aURI) 
 	{
+		if (!/^(https?|file|chrome|resource|data):/.test(aURI)) return;
 		var request  = new XMLHttpRequest();
 		var listener = new EzSidebarFavIconLoader(aURI, request);
 		request.onload = function() { listener.handleEvent(); };
