@@ -1,4 +1,5 @@
 <!ENTITY ezsidebar.OK "Aceptar">
+<!ENTITY ezsidebar.about.title "Acerca de Ez Sidebar">
 <!ENTITY ezsidebar.add.add "Añadir">
 <!ENTITY ezsidebar.add.choose "Cambiar archivo...">
 <!ENTITY ezsidebar.add.choose.accesskey "C">

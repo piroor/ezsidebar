@@ -96,6 +96,8 @@
 
 
 
+<!ENTITY ezsidebar.about.title       "O Ez Sidebarze">
+
 <!ENTITY ezsidebar.tabs.general   "Ogólne">
 <!ENTITY ezsidebar.tabs.advanced  "Zaawansowane">
 

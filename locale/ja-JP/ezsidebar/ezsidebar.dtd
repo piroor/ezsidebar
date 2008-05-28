@@ -58,6 +58,8 @@
 <!ENTITY ezsidebar.hideOnStartup.label "ブラウザ起動時は常にSidebarを閉じておく">
 
 
+<!ENTITY ezsidebar.about.title       "イージーSidebarについて">
+
 <!ENTITY ezsidebar.tabs.general   "全般">
 <!ENTITY ezsidebar.tabs.advanced  "詳細">
 

@@ -96,6 +96,8 @@
 
 
 
+<!ENTITY ezsidebar.about.title       "Ez Sidebar 选项">
+
 <!ENTITY ezsidebar.tabs.general   "常规">
 <!ENTITY ezsidebar.tabs.advanced  "高级">
 

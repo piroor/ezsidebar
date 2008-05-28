@@ -62,6 +62,8 @@
 
 
 
+<!ENTITY ezsidebar.about.title       "About Ez Sidebar">
+
 <!ENTITY ezsidebar.tabs.general   "General">
 <!ENTITY ezsidebar.tabs.advanced  "Advanced">
 
