@@ -1,9 +1,4 @@
 <!ENTITY ezsidebar.OK "Aceptar">
-<!ENTITY ezsidebar.about.caption "Información sobre versión">
-<!ENTITY ezsidebar.about.destributed "http://piro.sakura.ne.jp/">
-<!ENTITY ezsidebar.about.name_after " ">
-<!ENTITY ezsidebar.about.name_before "Ez Sidebar Ver.">
-<!ENTITY ezsidebar.about.title "Acerca de Ez Sidebar">
 <!ENTITY ezsidebar.add.add "Añadir">
 <!ENTITY ezsidebar.add.choose "Cambiar archivo...">
 <!ENTITY ezsidebar.add.choose.accesskey "C">
@@ -55,7 +50,6 @@
 <!ENTITY ezsidebar.shortcut.switchSidebarPanel.label "Usar Alt-PageUp/Alt-PageDown para cambiar de panel">
 <!ENTITY ezsidebar.show.label "Mostrar panel lateral">
 <!ENTITY ezsidebar.sidebar.caption "Comportamiento del panel lateral">
-<!ENTITY ezsidebar.tabs.about "Acerca de">
 <!ENTITY ezsidebar.tabs.advanced "Avanzado">
 <!ENTITY ezsidebar.tabs.general "General">
 <!ENTITY ezsidebar.title "Panel lateral">

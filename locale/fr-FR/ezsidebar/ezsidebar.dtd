@@ -98,7 +98,6 @@
 
 <!ENTITY ezsidebar.tabs.general   "Général">
 <!ENTITY ezsidebar.tabs.advanced  "Avancé">
-<!ENTITY ezsidebar.tabs.about     "À propos">
 
 <!ENTITY ezsidebar.sidebar.caption    "Comportement du panneau latéral">
 
@@ -113,12 +112,6 @@
 <!ENTITY ezsidebar.refresh.caption   "Actualiser les panneaux statiques">
 <!ENTITY ezsidebar.refresh.desc      "Quand les panneaux latéraux statiques (issus d'autres extensions) n'apparaissent pas correctement dans le panneau latéral flottant, cliquez sur bouton &quot;Actualiser&quot; ci-dessous :">
 <!ENTITY ezsidebar.refresh.button    "Actualiser">
-
-<!ENTITY ezsidebar.about.title       "À propos d' Ez Sidebar">
-<!ENTITY ezsidebar.about.caption     "Info sur la version">
-<!ENTITY ezsidebar.about.name_before "Ez Sidebar Ver.">
-<!ENTITY ezsidebar.about.name_after  "">
-<!ENTITY ezsidebar.about.destributed " Site de l'auteur.... http://piro.sakura.ne.jp/">
 
 <!ENTITY ezsidebar.OK                "OK">
 

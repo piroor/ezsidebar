@@ -98,7 +98,6 @@
 
 <!ENTITY ezsidebar.tabs.general   "常规">
 <!ENTITY ezsidebar.tabs.advanced  "高级">
-<!ENTITY ezsidebar.tabs.about     "关于">
 
 <!ENTITY ezsidebar.sidebar.caption    "侧边栏状态">
 
@@ -113,12 +112,6 @@
 <!ENTITY ezsidebar.refresh.caption   "刷新固定面板">
 <!ENTITY ezsidebar.refresh.desc      "浮动侧边栏不能正确显示固定面板 (由扩展自动安装) 时，单击 &quot;刷新&quot;: ">
 <!ENTITY ezsidebar.refresh.button    "刷新">
-
-<!ENTITY ezsidebar.about.title       "Ez Sidebar 选项">
-<!ENTITY ezsidebar.about.caption     "版本信息">
-<!ENTITY ezsidebar.about.name_before "Ez Sidebar 版本:">
-<!ENTITY ezsidebar.about.name_after  "">
-<!ENTITY ezsidebar.about.destributed "http://piro.sakura.ne.jp/">
 
 <!ENTITY ezsidebar.OK                "完成">
 

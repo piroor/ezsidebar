@@ -60,7 +60,6 @@
 
 <!ENTITY ezsidebar.tabs.general   "全般">
 <!ENTITY ezsidebar.tabs.advanced  "詳細">
-<!ENTITY ezsidebar.tabs.about     "イージーSidebarについて">
 
 <!ENTITY ezsidebar.sidebar.caption    "Sidebarの挙動">
 
@@ -75,12 +74,6 @@
 <!ENTITY ezsidebar.refresh.caption   "既定のパネルの再読み込み">
 <!ENTITY ezsidebar.refresh.desc      "分離したSidebar内で、他の拡張機能によって追加されたSidebarパネルが表示されない場合は、「再読み込み」ボタンを押して下さい。">
 <!ENTITY ezsidebar.refresh.button    "再読み込み">
-
-<!ENTITY ezsidebar.about.title       "イージーSidebarについて">
-<!ENTITY ezsidebar.about.caption     "バージョン情報">
-<!ENTITY ezsidebar.about.name_before "イージーSidebar Ver.">
-<!ENTITY ezsidebar.about.name_after  "">
-<!ENTITY ezsidebar.about.destributed "http://piro.sakura.ne.jp/">
 
 <!ENTITY ezsidebar.OK                "OK">
 

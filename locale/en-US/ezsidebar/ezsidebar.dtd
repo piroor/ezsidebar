@@ -64,7 +64,6 @@
 
 <!ENTITY ezsidebar.tabs.general   "General">
 <!ENTITY ezsidebar.tabs.advanced  "Advanced">
-<!ENTITY ezsidebar.tabs.about     "About">
 
 <!ENTITY ezsidebar.sidebar.caption    "Behavior of Sidebar">
 
@@ -79,12 +78,6 @@
 <!ENTITY ezsidebar.refresh.caption   "Refresh Static Panels">
 <!ENTITY ezsidebar.refresh.desc      "When static sidebar panels (provided by other extensions) are not shown correctly in the undocked Sidebar, press the &quot;Refresh&quot; button below:">
 <!ENTITY ezsidebar.refresh.button    "Refresh">
-
-<!ENTITY ezsidebar.about.title       "About Ez Sidebar">
-<!ENTITY ezsidebar.about.caption     "Version Info">
-<!ENTITY ezsidebar.about.name_before "Ez Sidebar Ver.">
-<!ENTITY ezsidebar.about.name_after  "">
-<!ENTITY ezsidebar.about.destributed "http://piro.sakura.ne.jp/">
 
 <!ENTITY ezsidebar.OK                "OK">
 

@@ -98,7 +98,6 @@
 
 <!ENTITY ezsidebar.tabs.general   "Ogólne">
 <!ENTITY ezsidebar.tabs.advanced  "Zaawansowane">
-<!ENTITY ezsidebar.tabs.about     "Wersja">
 
 <!ENTITY ezsidebar.sidebar.caption    "Zachowanie sidebaru">
 
@@ -113,12 +112,6 @@
 <!ENTITY ezsidebar.refresh.caption   "Odświerz statyczne panele">
 <!ENTITY ezsidebar.refresh.desc      "Jeżeli panele statyczne (czyli wywołane przez inne dodatki) nie są prwaidłowo wyświetlane w odpiętym sidebarze, naciśnij przycisk &quot;Odświerz&quot; poniżej:">
 <!ENTITY ezsidebar.refresh.button    "Odświerz">
-
-<!ENTITY ezsidebar.about.title       "O Ez Sidebarze">
-<!ENTITY ezsidebar.about.caption     "Inormacja o wersji">
-<!ENTITY ezsidebar.about.name_before "Ez Sidebar Ver.">
-<!ENTITY ezsidebar.about.name_after  "">
-<!ENTITY ezsidebar.about.destributed "http://mozillapl.org/projekty/Dodatki/EZSidebarPL">
 
 <!ENTITY ezsidebar.OK                "OK">
 
