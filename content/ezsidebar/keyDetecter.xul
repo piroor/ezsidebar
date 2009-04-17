@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="Shift_JIS"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Version: MPL 1.1/GPL 2.0/LGPL 2.1
@@ -37,7 +37,7 @@
 
 <!--
 
-	“ü—ÍƒL[ŒŸo—pƒ_ƒCƒAƒƒO
+	å…¥åŠ›ã‚­ãƒ¼æ¤œå‡ºç”¨ãƒ€ã‚¤ã‚¢ãƒ­ã‚°
 
 	window.openDialog(
 		'chrome://***/content/keyDetecter.xul',
@@ -48,7 +48,7 @@
 		cancelButtonLabel
 	);
 
-	‚Æ‚¢‚¤‹ï‡‚ÅA“ü—Í‚³‚ê‚½ƒL[‚Ìî•ñ‚ğŠi”[‚·‚éƒIƒuƒWƒFƒNƒg‚ÆA•\¦‚·‚éƒƒbƒZ[ƒW‚Æ‚ğˆø”‚Æ‚µ‚Ä“n‚·B
+	ã¨ã„ã†å…·åˆã§ã€å…¥åŠ›ã•ã‚ŒãŸã‚­ãƒ¼ã®æƒ…å ±ã‚’æ ¼ç´ã™ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã¨ã€è¡¨ç¤ºã™ã‚‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã¨ã‚’å¼•æ•°ã¨ã—ã¦æ¸¡ã™ã€‚
 
 -->
 
@@ -81,7 +81,7 @@ function onKeyPress(event)
 }
 
 
-// ƒL[ƒR[ƒh‚ğƒL[ƒR[ƒh–¼‚É•ÏŠ·
+// ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰ã‚’ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰åã«å¤‰æ›
 function getKeyCodeStrFromKeyCode(event)
 {
 	var codes = 'DOM_VK_CANCEL,DOM_VK_HELP,DOM_VK_BACK_SPACE,DOM_VK_TAB,DOM_VK_CLEAR,DOM_VK_RETURN,DOM_VK_ENTER,DOM_VK_SHIFT,DOM_VK_CONTROL,DOM_VK_ALT,DOM_VK_PAUSE,DOM_VK_CAPS_LOCK,DOM_VK_ESCAPE,DOM_VK_SPACE,DOM_VK_PAGE_UP,DOM_VK_PAGE_DOWN,DOM_VK_END,DOM_VK_HOME,DOM_VK_LEFT,DOM_VK_UP,DOM_VK_RIGHT,DOM_VK_DOWN,DOM_VK_PRINTSCREEN,DOM_VK_INSERT,DOM_VK_DELETE,DOM_VK_0,DOM_VK_1,DOM_VK_2,DOM_VK_3,DOM_VK_4,DOM_VK_5,DOM_VK_6,DOM_VK_7,DOM_VK_8,DOM_VK_9,DOM_VK_SEMICOLON,DOM_VK_EQUALS,DOM_VK_A,DOM_VK_B,DOM_VK_C,DOM_VK_D,DOM_VK_E,DOM_VK_F,DOM_VK_G,DOM_VK_H,DOM_VK_I,DOM_VK_J,DOM_VK_K,DOM_VK_L,DOM_VK_M,DOM_VK_N,DOM_VK_O,DOM_VK_P,DOM_VK_Q,DOM_VK_R,DOM_VK_S,DOM_VK_T,DOM_VK_U,DOM_VK_V,DOM_VK_W,DOM_VK_X,DOM_VK_Y,DOM_VK_Z,DOM_VK_NUMPAD0,DOM_VK_NUMPAD1,DOM_VK_NUMPAD2,DOM_VK_NUMPAD3,DOM_VK_NUMPAD4,DOM_VK_NUMPAD5,DOM_VK_NUMPAD6,DOM_VK_NUMPAD7,DOM_VK_NUMPAD8,DOM_VK_NUMPAD9,DOM_VK_MULTIPLY,DOM_VK_ADD,DOM_VK_SEPARATOR,DOM_VK_SUBTRACT,DOM_VK_DECIMAL,DOM_VK_DIVIDE,DOM_VK_F1,DOM_VK_F2,DOM_VK_F3,DOM_VK_F4,DOM_VK_F5,DOM_VK_F6,DOM_VK_F7,DOM_VK_F8,DOM_VK_F9,DOM_VK_F10,DOM_VK_F11,DOM_VK_F12,DOM_VK_F13,DOM_VK_F14,DOM_VK_F15,DOM_VK_F16,DOM_VK_F17,DOM_VK_F18,DOM_VK_F19,DOM_VK_F20,DOM_VK_F21,DOM_VK_F22,DOM_VK_F23,DOM_VK_F24,DOM_VK_NUM_LOCK,DOM_VK_SCROLL_LOCK,DOM_VK_COMMA,DOM_VK_PERIOD,DOM_VK_SLASH,DOM_VK_BACK_QUOTE,DOM_VK_OPEN_BRACKET,DOM_VK_BACK_SLASH,DOM_VK_CLOSE_BRACKET,DOM_VK_QUOTE,DOM_VK_META'.split(',');
@@ -92,7 +92,7 @@ function getKeyCodeStrFromKeyCode(event)
 	return '';
 }
 
-// ƒL[ƒ{[ƒhƒVƒ‡[ƒgƒJƒbƒg‚Ì‘g‚İ‡‚í‚¹‚ğ¦‚·•¶š—ñ‚ğ¶¬
+// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‚·ãƒ§ãƒ¼ãƒˆã‚«ãƒƒãƒˆã®çµ„ã¿åˆã‚ã›ã‚’ç¤ºã™æ–‡å­—åˆ—ã‚’ç”Ÿæˆ
 function keyboardShortcutToString(keyData)
 {
 	var keys = [];
@@ -105,7 +105,7 @@ function keyboardShortcutToString(keyData)
 	else if (keyData.key)
 		keys.push(keyData.key.toUpperCase());
 
-	if (keyData.keyCode) { // uVK_XXXv‚ÌƒL[ƒR[ƒh–¼‚ğƒL[–¼‚É•ÏŠ·
+	if (keyData.keyCode) { // ã€ŒVK_XXXã€ã®ã‚­ãƒ¼ã‚³ãƒ¼ãƒ‰åã‚’ã‚­ãƒ¼åã«å¤‰æ›
 		var keyName = keyData.keyCode.replace(/^VK_/, '').replace(/_/g, ' ').toLowerCase();
 		keyName = keyName.replace(/^(.)/, keyName.charAt(0).toUpperCase());
 		keys.push(keyName);
