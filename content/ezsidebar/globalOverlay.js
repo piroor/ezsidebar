@@ -788,9 +788,9 @@ var EzSidebarService =
 		if (!template.hasAttribute('ezsidebar-template')) return;
 
 		if (!('ezsidebarTemplate' in template))
-			eval('template.ezsidebarTemplate = '+template.getAttribute('ezsidebar-template'));
+			template.ezsidebarTemplate = this.evalInSandbox(template.getAttribute('ezsidebar-template'));
 
-		var obj = eval(aContainer.getAttribute('ezsidebar-datasource'));
+		var obj = this.evalInSandbox(aContainer.getAttribute('ezsidebar-datasource'));
 		obj.reset();
 
 		var children = aContainer.childNodes;
@@ -812,6 +812,16 @@ var EzSidebarService =
 
 			aContainer.lastChild.ezsidebarGenerated = true;
 		}
+	},
+	evalInSandbox : function(aCode, aOwner)
+	{
+		try {
+			var sandbox = new Components.utils.Sandbox(aOwner || 'about:blank');
+			return Components.utils.evalInSandbox(aCode, sandbox);
+		}
+		catch(e) {
+		}
+		return void(0);
 	},
   
 	initPopup : function(aPopup, aType) 
@@ -1979,8 +1989,6 @@ var EzSidebarService =
 		nullPointer = this.staticPanels;
 		delete nullPointer;
 
-		this.loadDefaultPrefs();
-
 		// RDFデータソースの指定を初期化
 		if (this.getPref('ezsidebar.enable.nsIXULTemplateBuilder')) {
 			var dsource_uri = this.datasource.URI;
@@ -2236,16 +2244,14 @@ var EzSidebarService =
 
 			ezsidebarButton.setAttribute('hidden', true);
 
-			eval(
-				'window.aios_toggleSidebar = ' +
-				aios_toggleSidebar.toString()
-					.replace(/fx_sidebarBox\.hidden/g, '(EzSidebarService.isUndocked ? !EzSidebarService.sidebarWindow : fx_sidebarBox.hidden)')
-			);
-			eval(
-				'window.aios_synchSidebar = ' +
-				aios_synchSidebar.toString()
-					.replace(/fx_sidebarBox\.hidden/g, '(EzSidebarService.isUndocked ? !EzSidebarService.sidebarWindow : fx_sidebarBox.hidden)')
-			);
+			eval('window.aios_toggleSidebar = ' +aios_toggleSidebar.toString().replace(
+				/fx_sidebarBox\.hidden/g,
+				'(EzSidebarService.isUndocked ? !EzSidebarService.sidebarWindow : fx_sidebarBox.hidden)'
+			));
+			eval('window.aios_synchSidebar = ' +aios_synchSidebar.toString().replace(
+				/fx_sidebarBox\.hidden/g,
+				'(EzSidebarService.isUndocked ? !EzSidebarService.sidebarWindow : fx_sidebarBox.hidden)'
+			));
 		}
 		else {
 			ezsidebarButton.removeAttribute('hidden');
@@ -2485,39 +2491,6 @@ var EzSidebarService =
 		}
 
 		return __ezsidebar__contentAreaClick(aEvent, aFieldNormalClicks);
-	},
- 
-	loadDefaultPrefs : function() 
-	{
-		const ioService = Components.classes['@mozilla.org/network/io-service;1'].getService(Components.interfaces.nsIIOService);
-		const uri = ioService.newURI('chrome://ezsidebar/content/default.js', null, null);
-		var content;
-		try {
-			var channel = ioService.newChannelFromURI(uri);
-			var stream  = channel.open();
-
-			var scriptableStream = Components.classes['@mozilla.org/scriptableinputstream;1'].createInstance(Components.interfaces.nsIScriptableInputStream);
-			scriptableStream.init(stream);
-
-			content = scriptableStream.read(scriptableStream.available());
-
-			scriptableStream.close();
-			stream.close();
-		}
-		catch(e) {
-		}
-
-		if (!content) return;
-
-
-		const DEFPrefs = Components.classes['@mozilla.org/preferences-service;1'].getService(Components.interfaces.nsIPrefService).getDefaultBranch(null);
-		function pref(aPrefstring, aValue)
-		{
-			EzSidebarService.setPref(aPrefstring, aValue, DEFPrefs);
-		}
-		var user_pref = pref; // alias
-
-		eval(content);
 	},
   
 	destruct : function() 

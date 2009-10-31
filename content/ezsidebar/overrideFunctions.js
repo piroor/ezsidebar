@@ -72,18 +72,14 @@ function OverrideFunctions()
 		};
 
 
-	eval('nsContextMenu.prototype.setTarget = ' +
-		nsContextMenu.prototype.setTarget.toSource().replace(
-			/(function[^\{]+\{)/,
-			'$1\nvar content = window.content;\n'
-		)
-	);
-	eval('nsContextMenu.prototype.viewPartialSource = ' +
-		nsContextMenu.prototype.viewPartialSource.toSource().replace(
-			/(function[^\{]+\{)/,
-			'$1\nvar content = window.content;\n'
-		)
-	);
+	eval('nsContextMenu.prototype.setTarget = '+nsContextMenu.prototype.setTarget.toSource().replace(
+		/(function[^\{]+\{)/,
+		'$1\nvar content = window.content;\n'
+	));
+	eval('nsContextMenu.prototype.viewPartialSource = '+nsContextMenu.prototype.viewPartialSource.toSource().replace(
+		/(function[^\{]+\{)/,
+		'$1\nvar content = window.content;\n'
+	));
 
 
 
