@@ -1256,7 +1256,7 @@ var EzSidebarService =
 			window.openDialog(
 				'chrome://ezsidebar/content/keyDetecter.xul',
 				'_blank',
-				'chrome,modal,resizable=no,titlebar=no,centerscreen',
+				'chrome,modal,centerscreen,dialog=no',
 				data,
 				this.strbundle.GetStringFromName('keyboardShortcut_description'),
 				this.strbundle.GetStringFromName('keyboardShortcut_cancel')
