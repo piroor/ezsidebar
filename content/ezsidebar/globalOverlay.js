@@ -612,7 +612,7 @@ var EzSidebarService =
 				aContainer.removeChild(children[i]);
 
 		this.panels.forEach(function(aPanel) {
-			var data = aContainer.ezsidebarTemplate(aPanel);
+			var data = aContainer.ezsidebarTemplate(aPanel, this.currentPanel == 'ezsidebar:broadcaster:'+aPanel.uri);
 			if (!data || !('localName' in data)) return;
 
 			aContainer.appendChild(document.createElement(data.localName));

@@ -265,7 +265,7 @@
 	<menu hidden="true">
 		<menupopup id="ezsidebar:viewSidebarMenu:mpopup"
 			ezsidebar-template="
-				function(aData)
+				function(aData, aSelected)
 				{
 					return {
 							localName : 'menuitem',
@@ -278,7 +278,8 @@
 								'ezsidebar-key'       : 'ezsidebar:key:'+aData.uri,
 								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
 								crop                  : 'end',
-								'class'               : 'menuitem-iconic'
+								'class'               : 'menuitem-iconic',
+								checked               : aSelected
 							}
 						};
 				}
