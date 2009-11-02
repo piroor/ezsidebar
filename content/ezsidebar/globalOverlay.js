@@ -1268,6 +1268,15 @@ var EzSidebarService =
 
 		var commandNode = document.getElementById(aCommandID);
 
+		if (this.isSidebarWindow) {
+			this.hostWindows.forEach(function(aWindow) {
+				var sv = aWindow.EzSidebarService;
+				sv.sidebarBox.setAttribute('sidebarcommand', aCommandID);
+				sv.sidebarBox.setAttribute('src', commandNode.getAttribute('sidebarurl'));
+				sv.sidebarTitle.setAttribute('value', commandNode.getAttribute('label'));
+			}, this);
+		}
+
 		var url   = commandNode.getAttribute('sidebarurl');
 		var title = commandNode.getAttribute('sidebartitle');
 		if (!title) title = commandNode.getAttribute('label');
@@ -1924,22 +1933,22 @@ var EzSidebarService =
 		if ('toggleAffectedChrome' in window) {
 			window.toggleAffectedChrome = function(aHide)
 			{
-			  var navToolbox = document.getElementById("navigator-toolbox");
-			  navToolbox.hidden = aHide;
-			  var statusbar = document.getElementById("status-bar");
-			  statusbar.hidden = aHide;
-			  if (aHide)
-			  {
-			    gChromeState = {};
-			    var sidebar = document.getElementById("sidebar-box");
-				const sv = EzSidebarService;
-			    gChromeState.sidebarOpen = sv.isUndocked ?
-			    	sv.sidebarWindow :
-			    	sv.sidebarBox.getAttribute('hidden') != 'true' ;
-			  }
+				var navToolbox = document.getElementById("navigator-toolbox");
+				navToolbox.hidden = aHide;
+				var statusbar = document.getElementById("status-bar");
+				statusbar.hidden = aHide;
+				if (aHide)
+				{
+					gChromeState = {};
+					var sidebar = document.getElementById("sidebar-box");
+					const sv = EzSidebarService;
+					gChromeState.sidebarOpen = sv.isUndocked ?
+						sv.sidebarWindow :
+						sv.sidebarBox.getAttribute('hidden') != 'true' ;
+				}
 
-			  if (gChromeState.sidebarOpen)
-			    toggleSidebar();
+				if (gChromeState.sidebarOpen)
+					toggleSidebar();
 			}
 		}
 
