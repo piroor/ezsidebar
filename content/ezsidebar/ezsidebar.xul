@@ -130,7 +130,7 @@ function ezsidebarUndockedShutdown()
 		<toolbarbutton class="tabs-closebutton"
 			oncommand="toggleSidebar();"/>
 	</sidebarheader>
-	<browser id="sidebar" autoscroll="false" flex="1"/>
+	<browser id="sidebar" type="content" autoscroll="false" flex="1"/>
 </vbox>
 
 <data hidden="true">
