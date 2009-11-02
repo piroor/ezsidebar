@@ -17,7 +17,7 @@ var EzSidebarService =
 	// プロパティ 
 	// properties
 	
-	get panels()
+	get panels() 
 	{
 		var panels = this.getPref('ezsidebar.panels');
 		try {
@@ -33,80 +33,6 @@ var EzSidebarService =
 		return aValue;
 	},
  
-	get datasource() 
-	{
-		if (!this._datasource) {
-			var uri;
-			try {
-				uri = this.IOService.newFileURI(this.datasourceFile).spec;
-			}
-			catch(e) { // [[interchangeability for Mozilla 1.1]]
-				uri = this.IOService.getURLSpecFromFile(this.datasourceFile);
-			}
-			// create datasource object
-			this._datasource = this.RDF.GetDataSource(uri);
-		}
-		return this._datasource;
-	},
-	_datasource : null,
-	
-	get datasourceFile() 
-	{
-		if (!this._datasourceFile) {
-			// get ProfileDirectory
-			const DIR = Components.classes['@mozilla.org/file/directory_service;1'].getService(Components.interfaces.nsIProperties);
-			var dir = DIR.get('ProfD', Components.interfaces.nsILocalFile);
-
-			// get URI
-			var tempLocalFile = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
-			tempLocalFile.initWithPath(this.getPref('ezsidebar.datasource.file') || dir.path);
-
-			var uri = this.getURLSpecFromFile(tempLocalFile);
-
-			if (!uri.match(/\/$/)) uri += '/';
-			if (tempLocalFile.isDirectory()) uri += 'ezsidebar.rdf';
-
-
-			// if the file doesn't exist, create it.
-			try {
-				var fileHandler = this.IOService.getProtocolHandler('file').QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-				tempLocalFile = fileHandler.getFileFromURLSpec(uri);
-			}
-			catch(e) { // [[interchangeability for Mozilla 1.1]]
-				try {
-					tempLocalFile = this.IOService.getFileFromURLSpec(uri);
-				}
-				catch(ex) { // [[interchangeability for Mozilla 1.0.x]]
-					tempLocalFile = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
-					this.IOService.initFileFromURLSpec(tempLocalFile, uri);
-				}
-			}
-
-			if (!tempLocalFile.exists())
-				tempLocalFile.create(tempLocalFile.NORMAL_FILE_TYPE, 0644);
-
-			this._datasourceFile = tempLocalFile;
-		}
-		return this._datasourceFile;
-	},
-	_datasourceFile : null,
- 
-	get panelsDS() 
-	{
-		if (!this._panels)
-			this._panels = new pRDFData('panels', this.datasource.URI, 'seq', 'http://white.sakura.ne.jp/~piro/rdf#', 'chrome://ezsidebar/content/ezsidebar.rdf#');
-		return this._panels;
-	},
-	_panels : null,
- 
-	get staticPanelsDS() 
-	{
-		if (!this._staticPanels)
-			this._staticPanels = new pRDFData('staticPanels', this.datasource.URI, 'seq', 'http://white.sakura.ne.jp/~piro/rdf#', 'chrome://ezsidebar/content/ezsidebar.rdf#');
-		return this._staticPanels;
-	},
-	_staticPanels : null,
-  
 	get strbundle() 
 	{
 		if (!this._strbundle) {
@@ -444,15 +370,6 @@ var EzSidebarService =
 	},
 	_Prefs : null,
  
-	get RDF() 
-	{
-		if (!this._RDF) {
-			this._RDF = Components.classes['@mozilla.org/rdf/rdf-service;1'].getService(Components.interfaces.nsIRDFService);
-		}
-		return this._RDF;
-	},
-	_RDF : null,
- 
 	get IOService() 
 	{
 		if (!this._IOService) {
@@ -545,39 +462,6 @@ var EzSidebarService =
 	isUserDefined : function(aID) 
 	{
 		return aID.match(/^ezsidebar:/) ? true : false ;
-	},
- 
-	chooseFile : function(aTitle, aFilter, aCustomFilters) 
-	{
-		const nsIFilePicker = Components.interfaces.nsIFilePicker;
-		const FP = Components.classes['@mozilla.org/filepicker;1'].createInstance(nsIFilePicker);
-
-		FP.init(window, aTitle, nsIFilePicker.modeOpen);
-
-		var filter = nsIFilePicker.filterAll;
-		if (aFilter) {
-			filter = aFilter | filter;
-		}
-		if (aCustomFilters) {
-			for (var i in aCustomFilters)
-				FP.appendFilter(aCustomFilters[i].label, aCustomFilters[i].pattern);
-		}
-
-		FP.appendFilters(filter);
-		if (aFilter)
-			FP.filterIndex = 1;
-
-		FP.show();
-
-		var file;
-		try {
-			file = FP.file.QueryInterface(Components.interfaces.nsILocalFile);
-		}
-		catch(e) {
-			return null;
-		}
-
-		return file;
 	},
  
 	getTopWindowOf : function(aWindowType) 
@@ -2509,9 +2393,128 @@ var EzSidebarService =
 		window.removeEventListener('keyup',     this.onKeyRelease, true);
 		window.removeEventListener('keypress',  this.onKeyRelease, true);
 		window.removeEventListener('mousedown', this.onKeyRelease, true);
-	}
+	},
   
-}; 
+// obsolete 
+	
+	get datasource() 
+	{
+		if (!this._datasource) {
+			var uri;
+			try {
+				uri = this.IOService.newFileURI(this.datasourceFile).spec;
+			}
+			catch(e) { // [[interchangeability for Mozilla 1.1]]
+				uri = this.IOService.getURLSpecFromFile(this.datasourceFile);
+			}
+			// create datasource object
+			this._datasource = this.RDF.GetDataSource(uri);
+		}
+		return this._datasource;
+	},
+	_datasource : null,
+ 
+	get datasourceFile() 
+	{
+		if (!this._datasourceFile) {
+			// get ProfileDirectory
+			const DIR = Components.classes['@mozilla.org/file/directory_service;1'].getService(Components.interfaces.nsIProperties);
+			var dir = DIR.get('ProfD', Components.interfaces.nsILocalFile);
+
+			// get URI
+			var tempLocalFile = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
+			tempLocalFile.initWithPath(this.getPref('ezsidebar.datasource.file') || dir.path);
+
+			var uri = this.getURLSpecFromFile(tempLocalFile);
+
+			if (!uri.match(/\/$/)) uri += '/';
+			if (tempLocalFile.isDirectory()) uri += 'ezsidebar.rdf';
+
+
+			// if the file doesn't exist, create it.
+			try {
+				var fileHandler = this.IOService.getProtocolHandler('file').QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+				tempLocalFile = fileHandler.getFileFromURLSpec(uri);
+			}
+			catch(e) { // [[interchangeability for Mozilla 1.1]]
+				try {
+					tempLocalFile = this.IOService.getFileFromURLSpec(uri);
+				}
+				catch(ex) { // [[interchangeability for Mozilla 1.0.x]]
+					tempLocalFile = Components.classes['@mozilla.org/file/local;1'].createInstance(Components.interfaces.nsILocalFile);
+					this.IOService.initFileFromURLSpec(tempLocalFile, uri);
+				}
+			}
+
+			if (!tempLocalFile.exists())
+				tempLocalFile.create(tempLocalFile.NORMAL_FILE_TYPE, 0644);
+
+			this._datasourceFile = tempLocalFile;
+		}
+		return this._datasourceFile;
+	},
+	_datasourceFile : null,
+ 
+	get panelsDS() 
+	{
+		if (!this._panels)
+			this._panels = new pRDFData('panels', this.datasource.URI, 'seq', 'http://white.sakura.ne.jp/~piro/rdf#', 'chrome://ezsidebar/content/ezsidebar.rdf#');
+		return this._panels;
+	},
+	_panels : null,
+ 
+	get staticPanelsDS() 
+	{
+		if (!this._staticPanels)
+			this._staticPanels = new pRDFData('staticPanels', this.datasource.URI, 'seq', 'http://white.sakura.ne.jp/~piro/rdf#', 'chrome://ezsidebar/content/ezsidebar.rdf#');
+		return this._staticPanels;
+	},
+	_staticPanels : null,
+ 
+	get RDF() 
+	{
+		if (!this._RDF) {
+			this._RDF = Components.classes['@mozilla.org/rdf/rdf-service;1'].getService(Components.interfaces.nsIRDFService);
+		}
+		return this._RDF;
+	},
+	_RDF : null,
+ 
+	chooseFile : function(aTitle, aFilter, aCustomFilters) 
+	{
+		const nsIFilePicker = Components.interfaces.nsIFilePicker;
+		const FP = Components.classes['@mozilla.org/filepicker;1'].createInstance(nsIFilePicker);
+
+		FP.init(window, aTitle, nsIFilePicker.modeOpen);
+
+		var filter = nsIFilePicker.filterAll;
+		if (aFilter) {
+			filter = aFilter | filter;
+		}
+		if (aCustomFilters) {
+			for (var i in aCustomFilters)
+				FP.appendFilter(aCustomFilters[i].label, aCustomFilters[i].pattern);
+		}
+
+		FP.appendFilters(filter);
+		if (aFilter)
+			FP.filterIndex = 1;
+
+		FP.show();
+
+		var file;
+		try {
+			file = FP.file.QueryInterface(Components.interfaces.nsILocalFile);
+		}
+		catch(e) {
+			return null;
+		}
+
+		return file;
+	},
+  
+	___ : null 
+};
 EzSidebarService.__proto__ = window['piro.sakura.ne.jp'].prefs;
   
 var EzSidebarWindowStateWatcher = 
