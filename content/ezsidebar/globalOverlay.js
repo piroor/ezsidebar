@@ -2582,7 +2582,10 @@ var EzSidebarWindowStateWatcher =
 		if (host && !sidebar) host.EzSidebarWindowStateWatcher.stop();
 		if (!host || !sidebar) return;
 
-		if (host.windowState == host.STATE_MINIMIZED) {
+		if (
+			host.windowState == host.STATE_MINIMIZED ||
+			(host.screenX == -32000 && host.screenY == -32000) // for Windows
+			) {
 			if (host.EzSidebarService.lastState == host.STATE_NORMAL) {
 				host.EzSidebarService.lastState = host.STATE_MINIMIZED;
 				sidebar.hostState = host.STATE_MINIMIZED;
@@ -2620,25 +2623,13 @@ var EzSidebarWindowStateWatcher =
  
 	init : function() 
 	{
-		try {
-			var pbi = this.service.Prefs.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-			pbi.addObserver(this.domain, this, false);
-
-			this.observe(null, 'nsPref:changed', null);
-		}
-		catch(e) {
-		}
+		EzSidebarService.addPrefListener(this);
 	},
  
 	destroy : function() 
 	{
 		this.stop();
-		try {
-			var pbi = this.service.Prefs.QueryInterface(Components.interfaces.nsIPrefBranchInternal);
-			pbi.removeObserver(this.domain, this, false);
-		}
-		catch(e) {
-		}
+		EzSidebarService.removePrefListener(this);
 	},
  
 }; 
