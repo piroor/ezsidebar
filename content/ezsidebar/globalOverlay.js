@@ -688,15 +688,15 @@ var EzSidebarService =
 	},
 	rebuildWithDelay : function()
 	{
-		if (this._debuildTimer)
-			window.clearTimeout(this._debuildTimer);
+		if (this._rebuildTimer)
+			window.clearTimeout(this._rebuildTimer);
 
-		this._debuildTimer = window.setTimeout(function(aSelf) {
-			aSelf._debuildTimer = null;
+		this._rebuildTimer = window.setTimeout(function(aSelf) {
+			aSelf._rebuildTimer = null;
 			aSelf.rebuild();
 		}, 100, this);
 	},
-	_debuildTimer : null,
+	_rebuildTimer : null,
 	
 	rebuildFromTemplate : function(aContainer) 
 	{
