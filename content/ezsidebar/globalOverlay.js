@@ -897,7 +897,9 @@ var EzSidebarService =
 		if (panel) {
 			check.value = this.getPref('ezsidebar.noconfirm.exist');
 			if (!check.value) {
-				toggleSidebar('ezsidebar:broadcaster:'+aURI);
+				var id = 'ezsidebar:broadcaster:'+aURI;
+				if (this.currentPanel != id)
+					toggleSidebar(id);
 			}
 			else {
 				this.PromptService.alertCheck(
