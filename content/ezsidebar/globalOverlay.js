@@ -1741,12 +1741,25 @@ var EzSidebarService =
 		aEvent.target.removeAttribute('dragover-bottom');
 
 		var targetURI = document.getElementById(aEvent.target.getAttribute('observes')).getAttribute('sidebarurl');
-		var toIndex   = this.panels.indexOf(targetURI);
-		var fromIndex = this.panels.indexOf(aURI);
-
+		var panels = this.panels;
+		var toIndex = 0;
+		var fromIndex = 0;
+		panels.forEach(function(aPanel, aIndex) {
+			if (aPanel.sidebar == targetURI)
+				toIndex = aIndex;
+			if (aPanel.sidebar == aURI)
+				fromIndex = aIndex;
+		});
 		if (toIndex == fromIndex) return;
 
-		this.panels.moveElementTo(aURI, toIndex);
+		var panel = panels.splice(fromIndex, 1)[0];
+		if (fromIndex < toIndex) toIndex--;
+		if (panels.length < toIndex)
+			panels.splice(toIndex, 0, panel);
+		else
+			panels.push(panel);
+
+		this.panels = panels;
 
 		aEvent.target.parentNode.hidePopup();
 	},
