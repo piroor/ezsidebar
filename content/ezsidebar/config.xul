@@ -6,7 +6,7 @@
 ]>
 <prefwindow xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 		title="&ezsidebar.about.title;"
-		style="max-width: 45em;">
+		style="max-width: 40em;">
 
 <prefpane id="prefpane-general" label="&ezsidebar.tabs.general;">
 	<preferences>
@@ -62,15 +62,17 @@
 		<checkbox preference="ezsidebar.override.addPanelOperation"
 			label="&ezsidebar.overrideAddPanel.label;"/>
 	</groupbox>
-	<groupbox orient="vertical" flex="1" style="overflow:auto">
+	<groupbox orient="vertical" flex="1">
 		<caption label="&ezsidebar.refresh.caption;"/>
-		<description flex="1">&ezsidebar.refresh.desc;</description>
-		<box orient="horizontal" align="center">
-			<spacer flex="1"/>
-			<button flex="1" label="&ezsidebar.refresh.button;"
-				oncommand="doRefresh();"/>
-			<spacer flex="1"/>
-		</box>
+		<vbox flex="1" style="overflow: auto; min-height: 7em;">
+			<description flex="1">&ezsidebar.refresh.desc;</description>
+			<box orient="horizontal" align="center">
+				<spacer flex="1"/>
+				<button flex="1" label="&ezsidebar.refresh.button;"
+					oncommand="doRefresh();"/>
+				<spacer flex="1"/>
+			</box>
+		</vbox>
 	</groupbox>
 </prefpane>
 
