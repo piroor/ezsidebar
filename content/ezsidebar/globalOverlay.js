@@ -33,6 +33,22 @@ var EzSidebarService =
 		return aValue;
 	},
  
+	get staticPanels() 
+	{
+		var panels = this.getPref('ezsidebar.staticPanels');
+		try {
+			if (panels) return Array.slice(this.evalInSandbox(panels));
+		}
+		catch(e) {
+		}
+		return [];
+	},
+	set staticPanels(aValue)
+	{
+		this.setPref('ezsidebar.staticPanels', uneval(aValue || []));
+		return aValue;
+	},
+ 
 	get strbundle() 
 	{
 		if (!this._strbundle) {
@@ -2127,7 +2143,7 @@ var EzSidebarService =
 			if (popup.childNodes[i].localName == 'menuitem')
 				items.push(popup.childNodes[i]);
 
-		var panels = this.evalInSandbox(this.getPref('ezsidebar.staticPanels') || '[]');
+		var panels = this.staticPanels;
 		if (panels.length == items.length) {
 			if (panels.every(function(aPanel, aIndex) {
 					items[aIndex].setAttribute('ezsidebar-id', items[aIndex].getAttribute('observes'));
@@ -2163,7 +2179,7 @@ var EzSidebarService =
 
 			panels.push(panel);
 		}, this);
-		this.setPref('ezsidebar.staticPanels', panels.toSource());
+		this.staticPanels = panels;
 	},
 
 	initStaticPanels : function()
@@ -2173,7 +2189,7 @@ var EzSidebarService =
 		var popup          = document.getElementById('viewSidebarMenu');
 		var firstItem = popup.firstChild;
 
-		var panels = this.evalInSandbox(this.getPref('ezsidebar.staticPanels') || '[]');
+		var panels = this.staticPanels;
 		panels.forEach(function(aPanel) {
 			var key = document.createElement('key');
 			for (let i in aPanel.keyAttr)
