@@ -18,9 +18,6 @@
 		screenY="24"
 		persist="screenX screenY">
 
-<script type="application/x-javascript" src="chrome://global/content/XPCNativeWrapper.js"/>
-<script type="application/x-javascript" src="chrome://ezsidebar/content/pXPCNativeWrapper.js"/>
-
 <script type="application/x-javascript" src="chrome://ezsidebar/content/pRDFData.js"/>
 <script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
 

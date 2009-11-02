@@ -180,12 +180,12 @@ function ezsidebarGetFrames()
 {
 	var contentWindow = ezsidebarGetContent();
 	if (contentWindow) {
-		var contentWindowWrapper = new XPCNativeWrapper(contentWindow, 'frames');
+		var frames = contentWindow.frames;
 		var ret = [],
 			i;
-		var length = contentWindowWrapper.frames.length;
+		var length = frames.length;
 		for (i = 0; i < length ; i++)
-			ret.push(contentWindowWrapper.frames[i]);
+			ret.push(frames[i]);
 		length = window.frames.length;
 		for (i = 0; i < length; i++)
 			ret.push(window.frames[i]);

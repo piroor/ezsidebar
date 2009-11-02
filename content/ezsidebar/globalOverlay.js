@@ -263,18 +263,12 @@ var EzSidebarService =
 		var doc = aDocument;
 		if (!doc) return null;
 
-		if (!(doc instanceof XPCNativeWrapper))
-			doc = new XPCNativeWrapper(doc,
-					'QueryInterface()',
-					'defaultView'
-				);
-
 		const kDSTreeNode = Components.interfaces.nsIDocShellTreeNode;
 		const kDSTreeItem = Components.interfaces.nsIDocShellTreeItem;
 		const kWebNav     = Components.interfaces.nsIWebNavigation;
 
 		if (doc.defaultView)
-			return (new XPCNativeWrapper(doc.defaultView, 'QueryInterface()'))
+			return doc.defaultView
 					.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 					.getInterface(kWebNav)
 					.QueryInterface(Components.interfaces.nsIDocShell);

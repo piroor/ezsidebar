@@ -8,9 +8,6 @@
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	xmlns:ezsidebar="http://white.sakura.ne.jp/~piro/rdf#">
 
-<script type="application/x-javascript" src="chrome://global/content/XPCNativeWrapper.js"/>
-<script type="application/x-javascript" src="chrome://ezsidebar/content/pXPCNativeWrapper.js"/>
-
 <script type="application/x-javascript" src="chrome://ezsidebar/content/pImageLoader.js"/>
 <script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
 <script type="application/x-javascript" src="chrome://ezsidebar/content/pRDFData.js"/>
@@ -437,11 +434,9 @@
 		label="&ezsidebar.addPanel.label;"
 		accesskey="&ezsidebar.addPanel.accesskey;"
 		oncommand="
-			var doc = (new XPCNativeWrapper(gContextMenu.target, 'ownerDocument')).ownerDocument;
-			EzSidebarService.addPanel(
-				(new XPCNativeWrapper(doc, 'URL')).URL,
-				(new XPCNativeWrapper(doc, 'title')).title
-		);"/>
+			var doc = gContextMenu.target.ownerDocument;
+			EzSidebarService.addPanel(doc.URL, doc.title);
+		"/>
 </popup>
 
 
