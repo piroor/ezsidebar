@@ -1619,10 +1619,11 @@ var EzSidebarService =
 	
 	onDragDropEvent : function(aMethod, aEvent) 
 	{
+		var top = Components.lookupMethod(window, 'top').call(window);
 		if (
 			this.getDocShellFromDocument(
 					aEvent.originalTarget.ownerDocument,
-					window.top
+					top
 						.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 						.getInterface(Components.interfaces.nsIWebNavigation)
 						.QueryInterface(Components.interfaces.nsIDocShell)
@@ -1630,7 +1631,7 @@ var EzSidebarService =
 				.QueryInterface(Components.interfaces.nsIWebNavigation)
 				.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
 				.getInterface(Components.interfaces.nsIDOMWindow)
-				!= window.top ||
+				!= top ||
 			(
 				!aEvent.target.getAttribute('ezsidebar-item') &&
 				aEvent.target.localName.match(/^(menu|menuitem|menuseparator|menupopup|popup|tooltip)$/)
