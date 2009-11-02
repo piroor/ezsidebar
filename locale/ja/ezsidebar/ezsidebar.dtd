@@ -1,0 +1,87 @@
+<!ENTITY ezsidebar.toggleShowHide.label  "Sidebar">
+
+<!ENTITY ezsidebar.show.label            "サイドバーを開く">
+<!ENTITY ezsidebar.hide.label            "サイドバーを閉じる">
+<!ENTITY ezsidebar.addNewPanel.label     "パネルを追加">
+<!ENTITY ezsidebar.addNewPanel.accesskey "A">
+<!ENTITY ezsidebar.addNewPanel.key       "P">
+<!ENTITY ezsidebar.reload.label          "リロード">
+<!ENTITY ezsidebar.reload.accesskey      "R">
+
+<!ENTITY ezsidebar.edit.label            "このパネルを編集">
+<!ENTITY ezsidebar.edit.accesskey        "E">
+<!ENTITY ezsidebar.removePanel.label     "削除">
+<!ENTITY ezsidebar.removePanel.accesskey "D">
+<!ENTITY ezsidebar.renamePanel.label     "名前の変更">
+<!ENTITY ezsidebar.renamePanel.accesskey "R">
+<!ENTITY ezsidebar.setShortcut.label     "ショートカットの変更">
+<!ENTITY ezsidebar.setShortcut.accesskey "K">
+<!ENTITY ezsidebar.clearShortcut.label   "ショートカットの削除">
+<!ENTITY ezsidebar.clearShortcut.accesskey "C">
+
+<!ENTITY ezsidebar.addPanel.label         "このページをSidebarに追加">
+<!ENTITY ezsidebar.addPanel.accesskey     "T">
+<!ENTITY ezsidebar.addLinkPanel.label     "リンク先をSidebarに追加">
+<!ENTITY ezsidebar.addLinkPanel.accesskey "T">
+
+<!ENTITY ezsidebar.menu.label     "パネル">
+
+
+
+<!ENTITY ezsidebar.add.title         "Sidebarパネルの追加">
+<!ENTITY ezsidebar.add.uri.label     "Sidebarにパネルとして追加するページのWebの場所（URL）か、ローカル ファイルを指定して下さい：">
+<!ENTITY ezsidebar.add.uri.accesskey "E">
+<!ENTITY ezsidebar.add.title.label   "パネルの名前：">
+<!ENTITY ezsidebar.add.title.accesskey "N">
+<!ENTITY ezsidebar.add.choose        "参照...">
+<!ENTITY ezsidebar.add.choose.accesskey "C">
+<!ENTITY ezsidebar.add.add           "追加">
+
+
+
+
+<!ENTITY ezsidebar.title               "Sidebar">
+<!ENTITY ezsidebar.titlemodifiermenuseparator " - ">
+
+<!ENTITY ezsidebar.functions.label     "設定">
+
+<!ENTITY ezsidebar.undock.label        "Sidebarを分離">
+<!ENTITY ezsidebar.dock.label          "Sidebarを結合">
+<!ENTITY ezsidebar.alwaysRaised.label  "常に前面に表示">
+
+<!ENTITY ezsidebar.collapse.label      "Sidebarをたたむ">
+<!ENTITY ezsidebar.expand.label        "Sidebarを元に戻す">
+<!ENTITY ezsidebar.autoCollapse.label  "Sidebarを自動でたたむ">
+
+<!ENTITY ezsidebar.autoClose.label     "Sidebarをブラウザと同時に閉じる">
+<!ENTITY ezsidebar.autoMinimize.label  "Sidebarをブラウザと同時に最小化する">
+<!ENTITY ezsidebar.hideOnStartup.label "ブラウザ起動時は常にSidebarを閉じておく">
+
+
+<!ENTITY ezsidebar.about.title       "イージーSidebarについて">
+
+<!ENTITY ezsidebar.tabs.general   "全般">
+<!ENTITY ezsidebar.tabs.advanced  "詳細">
+
+<!ENTITY ezsidebar.sidebar.caption    "Sidebarの挙動">
+
+<!ENTITY ezsidebar.behavior.caption   "挙動">
+<!ENTITY ezsidebar.shortcut.switchSidebarPanel.label "Alt-PageUp/Alt-PageDownでSidebarパネルを切り替える">
+<!ENTITY ezsidebar.overrideAddPanel.label "Mozilla Suite用のSidebarを追加するスクリプトを解釈する（要再起動）">
+
+<!ENTITY ezsidebar.datasource.caption "外部データファイルの使用">
+<!ENTITY ezsidebar.datasource.label   "データファイル：">
+<!ENTITY ezsidebar.datasource.button  "参照...">
+
+<!ENTITY ezsidebar.refresh.caption   "既定のパネルの再読み込み">
+<!ENTITY ezsidebar.refresh.desc      "分離したSidebar内で、他の拡張機能によって追加されたSidebarパネルが表示されない場合は、「再読み込み」ボタンを押して下さい。">
+<!ENTITY ezsidebar.refresh.button    "再読み込み">
+
+<!ENTITY ezsidebar.OK                "OK">
+
+
+
+
+
+<!ENTITY ezsidebar.closeKey          "w">
+<!ENTITY ezsidebar.quitKey           "q">

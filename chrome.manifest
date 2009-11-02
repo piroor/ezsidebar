@@ -1,0 +1,16 @@
+content	ezsidebar	jar:chrome/ezsidebar.jar!/content/ezsidebar/
+
+overlay	chrome://browser/content/browser.xul	chrome://ezsidebar/content/browserOverlay.xul
+overlay	chrome://browser/content/browser.xul	chrome://ezsidebar/content/buttonsOverlay.xul
+overlay	chrome://global/content/customizeToolbar.xul	chrome://ezsidebar/content/buttonsOverlay.xul
+
+locale	ezsidebar	en-US	jar:chrome/ezsidebar.jar!/locale/en-US/ezsidebar/
+locale	ezsidebar	ja	jar:chrome/ezsidebar.jar!/locale/ja/ezsidebar/
+locale	ezsidebar	sk-SK	jar:chrome/ezsidebar.jar!/locale/sk-SK/ezsidebar/
+locale	ezsidebar	hu-HU	jar:chrome/ezsidebar.jar!/locale/hu-HU/ezsidebar/
+locale	ezsidebar	it-IT	jar:chrome/ezsidebar.jar!/locale/it-IT/ezsidebar/
+
+skin	ezsidebar	classic/1.0	jar:chrome/ezsidebar.jar!/skin/classic/ezsidebar/
+
+style	chrome://browser/content/browser.xul	chrome://ezsidebar/skin/ezsidebar-button.css
+style	chrome://global/content/customizeToolbar.xul	chrome://ezsidebar/skin/ezsidebar-button.css
