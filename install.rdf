@@ -5,12 +5,12 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="{0EAF175C-0C46-4932-AB7D-F45D6C46F367}"
                    em:name="Ez Sidebar"
-                   em:version="3.1.2008052801"
+                   em:version="3.2.2008052801"
                    em:creator="SHIMODA Hiroshi"
                    em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."
                    em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html.en"
                    em:iconURL="chrome://ezsidebar/content/icon.png"
-                   em:optionsURL="chrome://ezsidebar/content/about.xul">
+                   em:optionsURL="chrome://ezsidebar/content/config.xul">
 	<em:translator>lenrock (Polish Language Pack)</em:translator>
 	<em:translator>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:translator>
 	<em:translator>Jean-Bernard Marcon (French Language Pack)</em:translator>

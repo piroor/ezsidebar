@@ -16,7 +16,7 @@
    - The Original Code is the Key Detecter.
    -
    - The Initial Developer of the Original Code is SHIMODA Hiroshi.
-   - Portions created by the Initial Developer are Copyright (C) 2002-2003
+   - Portions created by the Initial Developer are Copyright (C) 2002-2004
    - the Initial Developer. All Rights Reserved.
    -
    - Contributor(s): SHIMODA Hiroshi <piro@p.club.ne.jp>
@@ -107,8 +107,10 @@ function keyboardShortcutToString(keyData)
 
 	if (keyData.keyCode) { // 「VK_XXX」のキーコード名をキー名に変換
 		var keyName = keyData.keyCode.replace(/^VK_/, '').replace(/_/g, ' ').toLowerCase();
-		keyName = keyName.replace(/^(.)/, keyName.charAt(0).toUpperCase());
-		keys.push(keyName);
+		keyName = keyName.split(' ');
+		for (var i in keyName)
+			keyName[i] = keyName[i].replace(/^(.)/g, keyName[i].charAt(0).toUpperCase());
+		keys.push(keyName.join(' '));
 	}
 
 	return keys.length == 1 ? keys[0] : keys.join('+') ;

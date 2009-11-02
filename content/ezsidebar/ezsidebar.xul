@@ -41,9 +41,15 @@ function ezsidebarUndockedStartup()
 
 	document.getElementById('sidebar').addEventListener('load', ezsidebarOverrideContentWindowPointerEventListener, true);
 
-	window.gNavigatorBundle = document.getElementById('bundle_browser');
-	window.gProgressMeterPanel = document.getElementById('statusbar-progresspanel');
-	window.gPrefService = EzSidebarService.Prefs;
+	window.__defineGetter__('gNavigatorBundle', function() {
+		return document.getElementById('bundle_browser');
+	});
+	window.__defineGetter__('gProgressMeterPanel', function() {
+		return document.getElementById('statusbar-progresspanel');
+	});
+	window.__defineGetter__('gPrefService', function() {
+		return EzSidebarService.Prefs;
+	});
 
 	EzSidebarService.setPref('ezsidebar.show', true);
 
@@ -52,9 +58,11 @@ function ezsidebarUndockedStartup()
 		{
 			var appCore;
 			try {
-				appCore = Components.classes['@mozilla.org/appshell/component/browser/instance;1'].createInstance(Components.interfaces.nsIBrowserInstance);
-				if (!appCore)
-					throw 'Ez Sidebar: couldn\'t create a browser instance';
+				if ('@mozilla.org/appshell/component/browser/instance;1' in Components.classes) {
+					appCore = Components.classes['@mozilla.org/appshell/component/browser/instance;1'].createInstance(Components.interfaces.nsIBrowserInstance);
+					if (!appCore)
+						throw 'Ez Sidebar: couldn\'t create a browser instance';
+				}
 
 				if (!EzSidebarService.userSidebar.webNavigation)
 					throw 'Ez Sidebar: no XBL binding for browser';
@@ -62,7 +70,7 @@ function ezsidebarUndockedStartup()
 				alert('Ez Sidebar: Error launching browser window:' + e);
 				return;
 			}
-			appCore.setWebShellWindow(window);
+			if (appCore) appCore.setWebShellWindow(window);
 		},
 		0
 	);

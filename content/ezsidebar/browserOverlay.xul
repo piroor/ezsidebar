@@ -9,6 +9,7 @@
 	xmlns:ezsidebar="http://white.sakura.ne.jp/~piro/rdf#">
 
 <script type="application/x-javascript" src="chrome://ezsidebar/content/pImageLoader.js"/>
+<script type="application/x-javascript" src="chrome://ezsidebar/content/prefs.js"/>
 <script type="application/x-javascript" src="chrome://ezsidebar/content/globalOverlay.js"/>
 <script type="application/x-javascript" src="chrome://ezsidebar/content/pRDFData.js"/>
 
@@ -178,53 +179,25 @@
 
 <broadcasterset id="mainBroadcasterSet">
 	<broadcasterset id="ezsidebarBroadcasterSet"
-		datasources="chrome://ezsidebar/content/ezsidebar.rdf"
-		ref="chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:root"
-		ezsidebar-datasource="EzSidebarService.panels">
-		<template ezsidebar-template="
-			function(aIndex, aObj)
+		ezsidebar-template="
+			function(aData)
 			{
-				var obj = EzSidebarService.panels;
-				var res = obj.item(aIndex);
 				return {
 						localName : 'broadcaster',
 						attr : {
-							uri                   : res.Value,
+							uri                   : aData.uri,
 							'ezsidebar-generated' : true,
-							'ezsidebar-id'        : 'ezsidebar:broadcaster:'+res.Value,
-							label                 : obj.getData(res, 'Name'),
+							'ezsidebar-id'        : 'ezsidebar:broadcaster:'+aData.uri,
+							label                 : aData.name,
 							autoCheck             : false,
 							type                  : 'checkbox',
 							group                 : 'sidebar',
-							sidebarurl            : obj.getData(res,'URL'),
-							image                 : obj.getData(res,'Icon')
+							sidebarurl            : aData.sidebar,
+							image                 : aData.image
 						}
 					};
 			}
-			">
-			<rule>
-				<conditions>
-					<content uri="?cont"/>
-					<member container="?cont" child="?name"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#URL" object="?panel"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Icon" object="?icon"/>
-				</conditions>
-				<bindings/>
-				<action>
-					<broadcaster uri="?name"
-						ezsidebar-generated="true"
-						ezsidebar-id="ezsidebar:broadcaster:?name"
-						label="?label"
-						autoCheck="false"
-						type="checkbox"
-						group="sidebar"
-						sidebarurl="?panel"
-						image="?icon"/>
-				</action>
-			</rule>
-		</template>
-	</broadcasterset>
+			"/>
 	<broadcaster id="ezsidebar:broadcaster:isUserDefined"/>
 	<broadcaster id="ezsidebar:broadcaster:collapseExpand"/>
 	<broadcaster id="ezsidebar:broadcaster:autoCollapse"
@@ -241,86 +214,40 @@
 
 <keyset id="mainKeyset">
 	<keyset id="ezsidebarKeySet"
-		datasources="chrome://ezsidebar/content/ezsidebar.rdf"
-		ref="chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:root"
-		ezsidebar-datasource="EzSidebarService.panels">
-		<template ezsidebar-template="
-			function(aIndex, aObj)
+		ezsidebar-template="
+			function(aData)
 			{
-				var obj = EzSidebarService.panels;
-				var res = obj.item(aIndex);
-				return (!obj.getData(res, 'Key') &amp;&amp; !obj.getData(res, 'Keycode')) ? {} :
-					obj.getData(res, 'Key') ?
+				return (!aData.key &amp;&amp; !aData.keyCode) ?
+						{} :
+					aData.key ?
 						{
 							localName : 'key',
 							attr : {
-								uri                   : res.Value,
+								uri                   : aData.uri,
 								'ezsidebar-generated' : true,
-								'ezsidebar-id'        : 'ezsidebar:key:'+res.Value,
-								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+res.Value,
+								'ezsidebar-id'        : 'ezsidebar:key:'+aData.uri,
+								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+aData.uri,
 								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
-								'key'                 : obj.getData(res, 'Key'),
-								modifiers             : obj.getData(res, 'Modifiers')
+								'key'                 : aData.key,
+								modifiers             : aData.modifiers
 							}
 						} :
-					obj.getData(res, 'Keycode') ?
+					aData.keyCode ?
 						{
 							localName : 'key',
 							attr : {
-								uri                   : res.Value,
+								uri                   : aData.uri,
 								'ezsidebar-generated' : true,
-								'ezsidebar-id'        : 'ezsidebar:key:'+res.Value,
-								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+res.Value,
+								'ezsidebar-id'        : 'ezsidebar:key:'+aData.uri,
+								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+aData.uri,
 								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
-								keycode               : obj.getData(res, 'Keycode'),
-								modifiers             : obj.getData(res, 'Modifiers')
+								keycode               : aData.keyCode,
+								modifiers             : aData.modifiers
 							}
 						} :
 					{};
 			}
-			">
-			<rule ezsidebar:Key="" ezsidebar:Keycode=""/>
-			<rule>
-				<conditions>
-					<content uri="?cont"/>
-					<member container="?cont" child="?name"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Key" object="?key"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
-				</conditions>
-				<bindings>
-					<binding subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Modifiers" object="?modifiers"/>
-				</bindings>
-				<action>
-					<key uri="?name"
-						ezsidebar-generated="true"
-						ezsidebar-id="ezsidebar:key:?name"
-						ezsidebar-observes="ezsidebar:broadcaster:?name"
-						oncommand="toggleSidebar(this.getAttribute('ezsidebar-observes'));"
-						key="?key" modifiers="?modifiers"/>
-				</action>
-			</rule>
-			<rule>
-				<conditions>
-					<content uri="?cont"/>
-					<member container="?cont" child="?name"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Keycode" object="?keycode"/>
-					<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
-				</conditions>
-				<bindings>
-					<binding subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Modifiers" object="?modifiers"/>
-				</bindings>
-				<action>
-					<key uri="?name"
-						ezsidebar-generated="true"
-						ezsidebar-id="ezsidebar:key:?name"
-						ezsidebar-observes="ezsidebar:broadcaster:?name"
-						oncommand="toggleSidebar(this.getAttribute('ezsidebar-observes'));"
-						keycode="?keycode" modifiers="?modifiers"/>
-				</action>
-			</rule>
-			<rule/>
-		</template>
-	</keyset>
+			"/>
 	<key id="ezsidebar:key:toggleSidebar"
 		oncommand="toggleSidebar();"
 		keycode="VK_F9"/>
@@ -337,52 +264,25 @@
 	style="max-width: 24em;">
 	<menu hidden="true">
 		<menupopup id="ezsidebar:viewSidebarMenu:mpopup"
-			datasources="chrome://ezsidebar/content/ezsidebar.rdf"
-			ref="chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:root"
-			ezsidebar-datasource="EzSidebarService.panels">
-			<template ezsidebar-template="
-				function(aIndex, aObj)
+			ezsidebar-template="
+				function(aData)
 				{
-					var obj = EzSidebarService.panels;
-					var res = obj.item(aIndex);
 					return {
 							localName : 'menuitem',
 							attr : {
-								uri                   : res.Value,
+								uri                   : aData.uri,
 								'ezsidebar-item'      : true,
 								'ezsidebar-generated' : true,
-								'ezsidebar-id'        : 'ezsidebar:broadcaster:'+res.Value,
-								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+res.Value,
-								'ezsidebar-key'       : 'ezsidebar:key:'+res.Value,
+								'ezsidebar-id'        : 'ezsidebar:broadcaster:'+aData.uri,
+								'ezsidebar-observes'  : 'ezsidebar:broadcaster:'+aData.uri,
+								'ezsidebar-key'       : 'ezsidebar:key:'+aData.uri,
 								oncommand             : 'toggleSidebar(this.getAttribute(\'ezsidebar-observes\'));',
 								crop                  : 'end',
 								'class'               : 'menuitem-iconic'
 							}
 						};
 				}
-				">
-				<rule>
-					<conditions>
-						<content uri="?cont"/>
-						<member container="?cont" child="?name"/>
-						<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#Name" object="?label"/>
-						<triple subject="?name" predicate="http://white.sakura.ne.jp/~piro/rdf#URL" object="?panel"/>
-					</conditions>
-					<bindings/>
-					<action>
-						<menuitem uri="?name"
-							crop="end"
-							ezsidebar-item="true"
-							ezsidebar-generated="true"
-							oncommand="toggleSidebar(this.getAttribute('ezsidebar-observes'));"
-							ezsidebar-key="ezsidebar:key:?name"
-							ezsidebar-id="ezsidebar:broadcaster:?name"
-							ezsidebar-observes="ezsidebar:broadcaster:?name"
-							class="menuitem-iconic"/>
-					</action>
-				</rule>
-			</template>
-		</menupopup>
+				"/>
 		<data>
 			<menuseparator ezsidebar-item="true"
 				ezsidebar-menubar-item="true"/>

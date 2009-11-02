@@ -13,12 +13,26 @@ var EzSidebarService =
 	// 定数 
 	XULNS : 'http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul',
 	PREFROOT : 'extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}',
-
-	knsISupportsString : ('nsISupportsWString' in Components.interfaces) ? Components.interfaces.nsISupportsWString : Components.interfaces.nsISupportsString,
  
 	// プロパティ 
 	// properties
 	
+	get panels()
+	{
+		var panels = this.getPref('ezsidebar.panels');
+		try {
+			if (panels) return Array.slice(this.evalInSandbox(panels));
+		}
+		catch(e) {
+		}
+		return [];
+	},
+	set panels(aValue)
+	{
+		this.setPref('ezsidebar.panels', uneval(aValue || []));
+		return aValue;
+	},
+ 
 	get datasource() 
 	{
 		if (!this._datasource) {
@@ -77,7 +91,7 @@ var EzSidebarService =
 	},
 	_datasourceFile : null,
  
-	get panels() 
+	get panelsDS() 
 	{
 		if (!this._panels)
 			this._panels = new pRDFData('panels', this.datasource.URI, 'seq', 'http://white.sakura.ne.jp/~piro/rdf#', 'chrome://ezsidebar/content/ezsidebar.rdf#');
@@ -85,7 +99,7 @@ var EzSidebarService =
 	},
 	_panels : null,
  
-	get staticPanels() 
+	get staticPanelsDS() 
 	{
 		if (!this._staticPanels)
 			this._staticPanels = new pRDFData('staticPanels', this.datasource.URI, 'seq', 'http://white.sakura.ne.jp/~piro/rdf#', 'chrome://ezsidebar/content/ezsidebar.rdf#');
@@ -312,16 +326,16 @@ var EzSidebarService =
   
 	// observers and listeners 
 	
-	observe : function(aSubject, aTopic, aContext) 
+	observe : function(aSubject, aTopic, aData) 
 	{
 		switch(aTopic)
 		{
 			case 'toggleSidebar':
-				if (!aContext) return;
+				if (!aData) return;
 		//			if (aSubject == window) return;
 		//			alert('CURRENT : '+location.href+'\nFROM : '+aSubject.location.href);
-				var newChecked = aContext.split('\n')[1] == 'true';
-				var node  = window.document.getElementById(aContext.split('\n')[0]);
+				var newChecked = aData.split('\n')[1] == 'true';
+				var node  = window.document.getElementById(aData.split('\n')[0]);
 				var nodes = window.document.getElementsByAttribute('group', 'sidebar');
 
 				if (node) {
@@ -346,47 +360,18 @@ var EzSidebarService =
 				this.processingToShowSidebarWindow = false;
 				break;
 
+			case 'nsPref:changed':
+				if (aData == 'ezsidebar.panels') {
+					this.rebuildWithDelay();
+				}
+				break;
+
 			default:
 				break;
 		}
 	},
- 
-	RDFObserver : 
-	{
-		observe : function(aSource, aProperty)
-		{
-			if (String((aSource ? aSource.Value : '' ) || '').indexOf('chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:') < 0) return;
-
-			this.observeTimer = window.setTimeout(this.observeCallback, 100);
-		},
-		observeTimer : null,
-		observeCallback : function()
-		{
-			EzSidebarService.rebuild();
-		},
-
-		onAssert: function (aDS, aSource, aProperty, aTarget)
-		{
-			this.observe(aSource, aProperty);
-		},
-		onUnassert: function (aDS, aSource, aProperty, aTarget)
-		{
-			this.observe(aSource, aProperty);
-		},
-		onChange: function (aDS, aSource, aProperty, aOldTarget, aNewTarget)
-		{
-			this.observe(aSource, aProperty);
-		},
-		onMove: function (aDS, aOldSource, aNewSource, aProperty, aTarget)
-		{
-			this.observe(aNewSource, aProperty);
-		},
-		onBeginUpdateBatch: function(aDS) {},
-		onEndUpdateBatch: function(aDS) {},
-		// for old implementation
-		beginUpdateBatch: function (aDS) {},
-		endUpdateBatch: function (aDS) {}
-	},
+	// for pref listener
+	domain : 'ezsidebar.',
  
 	sidebarProgressListener : function() 
 	{
@@ -458,76 +443,7 @@ var EzSidebarService =
 		return this._Prefs;
 	},
 	_Prefs : null,
-	
-	getPref : function(aPrefstring, aPrefBranch) 
-	{
-		var branch = aPrefBranch || this.Prefs;
-
-		try {
-			var type = branch.getPrefType(aPrefstring);
-			switch (type)
-			{
-				case this.Prefs.PREF_STRING:
-					return branch.getComplexValue(aPrefstring, this.knsISupportsString).data;
-					break;
-				case this.Prefs.PREF_INT:
-					return branch.getIntPref(aPrefstring);
-					break;
-				default:
-					return branch.getBoolPref(aPrefstring);
-					break;
-			}
-		}
-		catch(e) {
-//			if (this.debug) alert(e+'\n\nCannot load "'+aPrefstring+'" as "'+type+'"');
-		}
-
-		return null;
-	},
  
-	setPref : function(aPrefstring, aNewValue, aPrefBranch) 
-	{
-		var type;
-		try {
-			type = typeof aNewValue;
-		}
-		catch(e) {
-			type = null;
-	//		if (this.debug) alert(e+'\n\n'+aPrefstring);
-		}
-
-		var branch = aPrefBranch || this.Prefs;
-
-		switch (type)
-		{
-			case 'string':
-				var string = ('@mozilla.org/supports-wstring;1' in Components.classes) ?
-						Components.classes['@mozilla.org/supports-wstring;1'].createInstance(this.knsISupportsString) :
-						Components.classes['@mozilla.org/supports-string;1'].createInstance(this.knsISupportsString) ;
-				string.data = aNewValue;
-				branch.setComplexValue(aPrefstring, this.knsISupportsString, string);
-				break;
-			case 'number':
-				branch.setIntPref(aPrefstring, parseInt(aNewValue));
-				break;
-			default:
-				branch.setBoolPref(aPrefstring, aNewValue);
-				break;
-		}
-		return true;
-	},
- 
-	clearPref : function(aPrefstring) 
-	{
-		try {
-			this.Prefs.clearUserPref(aPrefstring);
-		}
-		catch(e) {
-		}
-
-		return;
-	},
-  
 	get RDF() 
 	{
 		if (!this._RDF) {
@@ -734,12 +650,9 @@ var EzSidebarService =
 			nodes = [];
 		for (i = 0; i < containers.length; i++)
 		{
-			if (!containers[i] || !containers[i].builder) continue;
+			if (!containers[i]) continue;
 
-			if (nsIXULTemplateBuilderAvailable)
-				containers[i].builder.rebuild();
-			else
-				this.rebuildFromTemplate(containers[i]);
+			this.rebuildFromTemplate(containers[i]);
 
 			for (j = 0; j < containers[i].childNodes.length; j++)
 			{
@@ -773,39 +686,41 @@ var EzSidebarService =
 		for (i = 0; i < containers[2].nextSibling.childNodes.length; i++)
 			popup.appendChild(containers[2].nextSibling.childNodes[i].cloneNode(true));
 	},
+	rebuildWithDelay : function()
+	{
+		if (this._debuildTimer)
+			window.clearTimeout(this._debuildTimer);
+
+		this._debuildTimer = window.setTimeout(function(aSelf) {
+			aSelf._debuildTimer = null;
+			aSelf.rebuild();
+		}, 100, this);
+	},
+	_debuildTimer : null,
 	
 	rebuildFromTemplate : function(aContainer) 
 	{
-		var i, j;
+		if (!aContainer.hasAttribute('ezsidebar-template')) return;
 
-		var template = aContainer.hasAttribute('template') ? document.getElementById(aContainer.getAttribute('template')) : aContainer.getElementsByTagNameNS(this.XULNS, 'template')[0] ;
-		if (!template.hasAttribute('ezsidebar-template')) return;
-
-		if (!('ezsidebarTemplate' in template))
-			template.ezsidebarTemplate = this.evalInSandbox(template.getAttribute('ezsidebar-template'));
-
-		var obj = this.evalInSandbox(aContainer.getAttribute('ezsidebar-datasource'));
-		obj.reset();
+		if (!('ezsidebarTemplate' in aContainer))
+			aContainer.ezsidebarTemplate = this.evalInSandbox(aContainer.getAttribute('ezsidebar-template'));
 
 		var children = aContainer.childNodes;
-		for (i = children.length-1; i > -1; i--)
+		for (var i = children.length-1; i > -1; i--)
 			if ('ezsidebarGenerated' in children[i] &&
 				children[i].ezsidebarGenerated)
 				aContainer.removeChild(children[i]);
 
-		var node, data;
-		window.dump(aContainer.id+' :: '+obj.length+'\n');
-		for (i = 0; i < obj.length; i++)
-		{
-			data = template.ezsidebarTemplate(i, obj);
-			if (!data || !('localName' in data)) continue;
+		this.panels.forEach(function(aPanel) {
+			var data = aContainer.ezsidebarTemplate(aPanel);
+			if (!data || !('localName' in data)) return;
 
 			aContainer.appendChild(document.createElement(data.localName));
-			for (j in data.attr)
-				aContainer.lastChild.setAttribute(j, data.attr[j]);
+			for (var i in data.attr)
+				aContainer.lastChild.setAttribute(i, data.attr[i]);
 
 			aContainer.lastChild.ezsidebarGenerated = true;
-		}
+		}, this);
 	},
 	evalInSandbox : function(aCode, aOwner)
 	{
@@ -1071,12 +986,18 @@ var EzSidebarService =
 
 		var check = { value : null };
 		var retVal;
-		var escaped = 'escape' in this.panels ? this.panels.escape(aURI) : escape(aURI) ;
 
-		if (aURI && this.panels.getData(aURI, 'URL')) {
+		var panels = this.panels;
+		var panel;
+		panels.some(function(aPanel) {
+			if (aPanel.sidebar != aURI) return false;
+			panel = aPanel;
+			return true;
+		});
+		if (panel) {
 			check.value = this.getPref('ezsidebar.noconfirm.exist');
 			if (!check.value) {
-				toggleSidebar('ezsidebar:broadcaster:chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:'+escaped);
+				toggleSidebar('ezsidebar:broadcaster:'+aURI);
 			}
 			else {
 				this.PromptService.alertCheck(
@@ -1127,18 +1048,16 @@ var EzSidebarService =
 			if (!aTitle) return;
 		}
 
-		this.panels.setData(aURI,
-			'Name', aTitle,
-			'URL',  aURI
-		);
-
+		panels.push({
+			uri     : aURI,
+			name    : aTitle,
+			sidebar : aURI
+		});
+		this.panels = panels;
 
 		this.setFavIconFor(aURI);
 
-
-		this.rebuild();
-
-		window.setTimeout(toggleSidebar, 100, 'ezsidebar:broadcaster:chrome://ezsidebar/content/ezsidebar.rdf#urn:panels:'+escaped);
+		window.setTimeout(toggleSidebar, 200, 'ezsidebar:broadcaster:'+aURI);
 	},
 	
 	addNewPanel : function() 
@@ -1163,11 +1082,11 @@ var EzSidebarService =
 		this.addPanel(data.uri, data.title);
 	},
  
-	setFavIconFor : function(aURI) 
+	setFavIconFor : function(aURI, aPanel) 
 	{
 		if (!/^(https?|file|chrome|resource|data):/.test(aURI)) return;
 		var request  = new XMLHttpRequest();
-		var listener = new EzSidebarFavIconLoader(aURI, request);
+		var listener = new EzSidebarFavIconLoader(aURI, request, aPanel);
 		request.onload = function() { listener.handleEvent(); };
 		request.open('GET', aURI);
 		request.send(null);
@@ -1178,8 +1097,17 @@ var EzSidebarService =
 		if (aOut) aOut.value = false;
 		if (!this.isUserDefined(aID)) return;
 
-		var res   = this.RDF.GetResource(aID.replace(/^ezsidebar:\w+:/, ''));
-		var title = this.panels.getData(res, 'Name');
+		var uri = aID.replace(/^ezsidebar:\w+:/, '');
+
+		var panels = this.panels;
+		var panel;
+		panels.some(function(aPanel) {
+			if (aPanel.uri != uri) return false;
+			panel = aPanel;
+			return true;
+		}, this);
+
+		var title = panel.name;
 
 		var newTitleObj = { value : title };
 		if (!this.PromptService.prompt(
@@ -1195,7 +1123,9 @@ var EzSidebarService =
 		newTitle = newTitleObj.value;
 		if (!newTitle || newTitle == title) return;
 
-		this.panels.setData(res, 'Name', newTitle);
+		panel.name = newTitle;
+		this.panels = panels;
+
 		this.sidebarTitle.setAttribute('value', newTitle);
 
 		this.updateTitlebar();
@@ -1213,8 +1143,18 @@ var EzSidebarService =
 		if (aOut) aOut.value = false;
 		if (!this.isUserDefined(aID)) return;
 
-		var res   = this.RDF.GetResource(aID.replace(/^ezsidebar:\w+:/, ''));
-		var title = this.panels.getData(res, 'Name');
+		var uri = aID.replace(/^ezsidebar:\w+:/, '');
+
+		var panels = this.panels;
+		var panel;
+		panels.some(function(aPanel) {
+			if (aPanel.uri != uri) return false;
+			panel = aPanel;
+			return true;
+		}, this);
+		if (!panel) return;
+
+		var title = panel.name;
 
 		var check = { value : this.getPref('ezsidebar.noconfirm.remove') };
 		if (!check.value) {
@@ -1231,7 +1171,9 @@ var EzSidebarService =
 				return;
 		}
 
-		this.panels.removeData(res);
+		this.panels = panels.filter(function(aPanel) {
+			return aPanel.uri != uri;
+		});
 
 		if (this.sidebarBox.getAttribute('sidebarcommand') == aID) {
 			this.sidebarBox.setAttribute('hidden', true);
@@ -1269,70 +1211,78 @@ var EzSidebarService =
 	{
 		if (!this.isUserDefined(aID)) return;
 
-		var res = this.RDF.GetResource(aID.replace(/^ezsidebar:\w+:/, ''));
+		var uri = aID.replace(/^ezsidebar:\w+:/, '');
+
+		var panels = this.panels;
+		var panel;
+		panels.some(function(aPanel) {
+			if (aPanel.uri != uri) return false;
+			panel = aPanel;
+			return true;
+		}, this);
+		if (!panel) return;
+
 		if (aShouldClear) {
-			this.panels.setData(res,
-				'Key',       void(0),
-				'Keycode',   void(0),
-				'Modifiers', void(0)
-			);
-			return;
+			delete panel.key;
+			delete panel.keyCode;
+			delete panel.modifiers;
 		}
+		else {
+			var key  = document.getElementById(aID.replace(/^ezsidebar:broadcaster:/, 'ezsidebar:key:'));
+			var mod  = key ? key.getAttribute('modifiers') : '' ;
+			var data = key ? {
+					key      : key.getAttribute('key').toUpperCase(),
+					charCode : key.getAttribute('key').toUpperCase().charCodeAt(0),
+					keyCode  : key.getAttribute('keycode'),
+					altKey   : (mod.match(/alt/) ? true : false),
+					ctrlKey  : (mod.match(/control/) ? true : false),
+					metaKey  : (mod.match(/meta/) ? true : false),
+					shiftKey : (mod.match(/shift/) ? true : false),
+					string   : '',
+					modified : false
+				} :
+				{
+					key      : '',
+					charCode : 0,
+					keyCode  : '',
+					altKey   : false,
+					ctrlKey  : false,
+					metaKey  : false,
+					shiftKey : false,
+					string   : '',
+					modified : false
+				};
 
-		var key  = document.getElementById(aID.replace(/^ezsidebar:broadcaster:/, 'ezsidebar:key:'));
-		var mod  = key ? key.getAttribute('modifiers') : '' ;
-		var data = key ? {
-				key      : key.getAttribute('key').toUpperCase(),
-				charCode : key.getAttribute('key').toUpperCase().charCodeAt(0),
-				keyCode  : key.getAttribute('keycode'),
-				altKey   : (mod.match(/alt/) ? true : false),
-				ctrlKey  : (mod.match(/control/) ? true : false),
-				metaKey  : (mod.match(/meta/) ? true : false),
-				shiftKey : (mod.match(/shift/) ? true : false),
-				string   : '',
-				modified : false
-			} :
-			{
-				key      : '',
-				charCode : 0,
-				keyCode  : '',
-				altKey   : false,
-				ctrlKey  : false,
-				metaKey  : false,
-				shiftKey : false,
-				string   : '',
-				modified : false
-			};
+			window.openDialog(
+				'chrome://ezsidebar/content/keyDetecter.xul',
+				'_blank',
+				'chrome,modal,resizable=no,titlebar=no,centerscreen',
+				data,
+				this.strbundle.GetStringFromName('keyboardShortcut_description'),
+				this.strbundle.GetStringFromName('keyboardShortcut_cancel')
+			);
+			if (!data.modified) return;
 
-		window.openDialog(
-			'chrome://ezsidebar/content/keyDetecter.xul',
-			'_blank',
-			'chrome,modal,resizable=no,titlebar=no,centerscreen',
-			data,
-			this.strbundle.GetStringFromName('keyboardShortcut_description'),
-			this.strbundle.GetStringFromName('keyboardShortcut_cancel')
-		);
-		if (!data.modified) return;
+			var modifiers = [];
+			if (data.altKey)   modifiers.push('alt');
+			if (data.ctrlKey)  modifiers.push('control');
+			if (data.metaKey)  modifiers.push('meta');
+			if (data.shiftKey) modifiers.push('shift');
 
-		var modifiers = [];
-		if (data.altKey)   modifiers.push('alt');
-		if (data.ctrlKey)  modifiers.push('control');
-		if (data.metaKey)  modifiers.push('meta');
-		if (data.shiftKey) modifiers.push('shift');
+			if (data.key) panel.key = data.key;
+			if (data.keyCode) panel.keyCode = data.keyCode;
+			if (modifiers.length) panel.modifiers = modifiers.join(',');
 
-		this.panels.setData(res,
-			'Key',       (data.key || void(0)),
-			'Keycode',   (data.keyCode || void(0)),
-			'Modifiers', (modifiers.length ? modifiers.join(',') : void(0) )
-		);
-
-		this.PromptService.alert(
-			window,
-			this.strbundle.GetStringFromName('messages_title'),
-			this.strbundle.GetStringFromName('keyboardShortcut_complete')
-				.replace(/%t/gi, this.panels.getData(res, 'Name'))
-				.replace(/%s/gi, data.string)
-		);
+			if (panel.key || data.keyCode || modifiers.length)
+				this.PromptService.alert(
+					window,
+					this.strbundle.GetStringFromName('messages_title'),
+					this.strbundle.GetStringFromName('keyboardShortcut_complete')
+						.replace(/%t/gi, panel.name)
+						.replace(/%s/gi, data.string)
+				);
+		}
+		this.panels = panels;
 	},
 	
 	setKeyboardShortcutForCurrentPanel : function(aShouldClear) 
@@ -1371,16 +1321,17 @@ var EzSidebarService =
 		if (ESS.isUndocked) {
 			var sidebarWindow;
 			if (ESS.isSidebarWindow) {
+				var command = document.getElementById(aCommand);
 				if (isNullCommand ||
 					(
 						aCommand == ESS.currentPanel &&
-						document.getElementById(aCommand).getAttribute('checked')
+						command &&
+						command.getAttribute('checked')
 					)) {
 					ESS.ObserverService.notifyObservers(window, 'sidebarWindowHidden', null);
 					window.close();
 				}
-				else if (document.getElementById(aCommand) &&
-					!document.getElementById(aCommand).getAttribute('checked'))
+				else if (command && !command.getAttribute('checked'))
 					ESS.toggleSidebarInternal(aCommand);
 			}
 			else if (sidebarWindow = ESS.sidebarWindow) {
@@ -1977,21 +1928,7 @@ var EzSidebarService =
 
 		if (!this.sidebarBox) return; // not browser, not sidebar
 
-
-		var nullPointer;
-		nullPointer = this.panels;
-		nullPointer = this.staticPanels;
-		delete nullPointer;
-
-		// RDFデータソースの指定を初期化
-		if (this.getPref('ezsidebar.enable.nsIXULTemplateBuilder')) {
-			var dsource_uri = this.datasource.URI;
-			var nodes   = document.getElementsByAttribute('datasources', 'chrome://ezsidebar/content/ezsidebar.rdf'),
-				dsource = this.RDF.GetDataSource(dsource_uri);
-			for (var i = 0; i < nodes.length; i++)
-				nodes[i].database.AddDataSource(dsource);
-		}
-
+		this.migratePanels();
 
 		this.sidebarHeight = this.getPref('ezsidebar.contentHeight') || 0;
 
@@ -2223,8 +2160,7 @@ var EzSidebarService =
 			window.setTimeout('EzSidebarService.initBrowserWindow();', 100);
 		}
 
-		window.setTimeout('EzSidebarService.datasource.AddObserver(EzSidebarService.RDFObserver);', 100);
-
+		this.addPrefListener(this);
 
 
 		// for All-In-One Sidebar
@@ -2271,113 +2207,118 @@ var EzSidebarService =
 		}
 	},
  
+	migratePanels : function() 
+	{
+		if (this.getPref('ezsidebar.panels') !== null) return;
+
+		var migrated = [];
+		var ds = this.panelsDS;
+		var node, data, resource;
+		for (var i = 0, maxi = ds.length; i < maxi; i++)
+		{
+			data = template.ezsidebarTemplate(i, ds);
+			resource = ds.item(i);
+			if (!data || !('localName' in data)) continue;
+
+			migrated.push({
+				uri       : resource.Value,
+				name      : ds.getData(resource, 'Name'),
+				sidebar   : ds.getData(resource, 'URL'),
+				image     : ds.getData(resource, 'Icon'),
+				key       : ds.getData(resource, 'Key'),
+				keyCode   : ds.getData(resource, 'Keycode'),
+				modifiers : ds.getData(resource, 'Modifiers')
+			});
+		}
+
+		this.panels = migrated;
+	},
+ 
 	getStaticPanels : function() 
 	{
-		var i;
-
 		var popup  = document.getElementById('viewSidebarMenu'),
 			items  = [],
 			labels = [];
-		for (i = 0; !popup.childNodes[i].getAttribute('ezsidebar-item'); i++)
+		for (var i = 0; !popup.childNodes[i].getAttribute('ezsidebar-item'); i++)
 			if (popup.childNodes[i].localName == 'menuitem')
 				items.push(popup.childNodes[i]);
 
-		if (this.staticPanels.length == items.length) {
-			var modified = false;
-			for (i = 0; i < this.staticPanels.length; i++)
-			{
-				items[i].setAttribute('ezsidebar-id', items[i].getAttribute('observes'));
-				if (items[i].label != this.staticPanels.getData(this.staticPanels.item(i), 'Name'))
-					modified = true;
-			}
-
-			if (!modified) return;
+		var panels = this.evalInSandbox(this.getPref('ezsidebar.staticPanels') || '[]');
+		if (panels.length == items.length) {
+			if (panels.every(function(aPanel, aIndex) {
+					items[aIndex].setAttribute('ezsidebar-id', items[aIndex].getAttribute('observes'));
+					return items[aIndex].label == aPanel.name;
+				}, this))
+				return;
 		}
-		this.staticPanels.clearData();
 
-		var j, item;
-		var broadcaster, key;
-		for (i in items)
-		{
-			item        = items[i];
-			broadcaster = document.getElementById(item.getAttribute('observes'));
-			key         = document.getElementById(item.getAttribute('key'));
+		panels = [];
+		items.forEach(function(aItem) {
+			var panel = { name : aItem.getAttribute('label') };
 
-			for (j = 0; j < item.attributes.length; j++)
-				this.staticPanels.setData(i,
-					'itemAttrName'+j,  item.attributes[j].name,
-					'itemAttrValue'+j, item.attributes[j].value
-				);
+			panel.itemAttr = {};
+			Array.slice(aItem.attributes).forEach(function(aAttr) {
+					panel.itemAttr[aAttr.name] = aAttr.value;
+				});
+			panel.itemAttr.observes = aItem.getAttribute('observes');
+			panel.itemAttr.key = aItem.getAttribute('key');
 
-			this.staticPanels.setData(i,
-				'itemAttrName'+j,      'observes',
-				'itemAttrValue'+j,     item.getAttribute('observes'),
-				'itemAttrName'+(j+1),  'key',
-				'itemAttrValue'+(j+1), item.getAttribute('key')
-			);
+			panel.broadcasterAttr = {};
+			var broadcaster = document.getElementById(aItem.getAttribute('observes'));
+			if (broadcaster)
+				Array.slice(broadcaster.attributes).forEach(function(aAttr) {
+					panel.broadcasterAttr[aAttr.name] = aAttr.value;
+				});
 
-			if (broadcaster) {
-				for (j = 0; j < broadcaster.attributes.length; j++)
-					this.staticPanels.setData(i,
-						'broadcasterAttrName'+j,  broadcaster.attributes[j].name,
-						'broadcasterAttrValue'+j, broadcaster.attributes[j].value
-					);
-			}
-			if (key) {
-				for (j = 0; j < key.attributes.length; j++)
-					this.staticPanels.setData(i,
-						'keyAttrName'+j,  key.attributes[j].name,
-						'keyAttrValue'+j, key.attributes[j].value
-					);
-			}
-		}
+			panel.keyAttr = {};
+			var key = document.getElementById(aItem.getAttribute('key'));
+			if (key)
+				Array.slice(key.attributes).forEach(function(aAttr) {
+					panel.keyAttr[aAttr.name] = aAttr.value;
+				});
+
+			panels.push(panel);
+		}, this);
+		this.setPref('ezsidebar.staticPanels', panels.toSource());
 	},
 
 	initStaticPanels : function()
 	{
-		var i, j, res;
-		var item,
-			broadcaster,
-			key;
 		var broadcasterset = document.getElementById('mainBroadcasterSet');
 		var keyset         = document.getElementById('mainKeyset');
 		var popup          = document.getElementById('viewSidebarMenu');
 		var firstItem = popup.firstChild;
-		for (i = 0; i < this.staticPanels.length; i++)
-		{
-			res = this.staticPanels.item(i);
 
-			key = document.createElement('key');
-			for (j = 0; this.staticPanels.getData(res, 'keyAttrName'+j); j++)
-				key.setAttribute(
-					this.staticPanels.getData(res, 'keyAttrName'+j),
-					this.staticPanels.getData(res, 'keyAttrValue'+j)
-				);
-			if (j && !document.getElementById(key.getAttribute('id')))
+		var panels = this.evalInSandbox(this.getPref('ezsidebar.staticPanels') || '[]');
+		panels.forEach(function(aPanel) {
+			var key = document.createElement('key');
+			for (let i in aPanel.keyAttr)
+			{
+				key.setAttribute(i, aPanel.keyAttr[i]);
+			}
+			if ('id' in aPanel.keyAttr &&
+				!document.getElementById(key.getAttribute('id')))
 				keyset.appendChild(key);
 
-			broadcaster = document.createElement('broadcaster');
-			for (j = 0; this.staticPanels.getData(res, 'broadcasterAttrName'+j); j++)
-				broadcaster.setAttribute(
-					this.staticPanels.getData(res, 'broadcasterAttrName'+j),
-					this.staticPanels.getData(res, 'broadcasterAttrValue'+j)
-				);
-			if (j && !document.getElementById(broadcaster.getAttribute('id')))
+			var broadcaster = document.createElement('broadcaster');
+			for (let i in aPanel.broadcasterAttr)
+			{
+				broadcaster.setAttribute(i, aPanel.keyAttr[i]);
+			}
+			if ('id' in aPanel.broadcasterAttr &&
+				!document.getElementById(broadcaster.getAttribute('id')))
 				broadcasterset.appendChild(broadcaster);
 
-			item = document.createElement('menuitem');
-			for (j = 0; this.staticPanels.getData(res, 'itemAttrName'+j); j++)
+			var item = document.createElement('menuitem');
+			for (let i in aPanel.itemAttr)
 			{
-				item.setAttribute(
-					this.staticPanels.getData(res, 'itemAttrName'+j),
-					this.staticPanels.getData(res, 'itemAttrValue'+j)
-				);
-//				alert(this.staticPanels.getData(res, 'itemAttrName'+j)+'/'+this.staticPanels.getData(res, 'itemAttrValue'+j));
+				item.setAttribute(i, aPanel.itemAttr[i]);
 			}
 			item.setAttribute('ezsidebar-id', item.getAttribute('observes'));
-			if (j && !popup.getElementsByAttribute('observes', item.getAttribute('observes')).length)
+			if ('observes' in aPanel.itemAttr &&
+				!popup.getElementsByAttribute('observes', item.getAttribute('observes')).length)
 				popup.insertBefore(item, firstItem);
-		}
+		}, this);
 	},
  
 	sidebarAddPanel : function(aTitle, aContentURL, aCustomizeURL) { 
@@ -2532,7 +2473,7 @@ var EzSidebarService =
 				this.userSidebar.sidebarProgressFilter.removeProgressListener(this.userSidebar.sidebarProgressListener);
 				this.userSidebar.removeProgressListener(this.userSidebar.sidebarProgressFilter);
 			}
-			this.datasource.RemoveObserver(this.RDFObserver);
+			this.removePrefListener(this);
 		}
 
 		if (this.isSidebarWindow) {
@@ -2571,6 +2512,7 @@ var EzSidebarService =
 	}
   
 }; 
+EzSidebarService.__proto__ = window['piro.sakura.ne.jp'].prefs;
   
 var EzSidebarWindowStateWatcher = 
 {
@@ -2787,8 +2729,14 @@ EzSidebarFavIconLoader.prototype = {
 	onImageLoad : function(aImageData) 
 	{
 		if (!aImageData) return;
-		EzSidebarService.panels.setData(this.mURI, 'Icon', aImageData);
-		EzSidebarService.rebuild();
+
+		var panels = EzSidebarService.panels;
+		panels.some(function(aPanel) {
+			if (aPanel.uri != this.mURI) return false;
+			aPanel.image = aImageData;
+			return true;
+		}, this);
+		EzSidebarService.panels = panels;
 	}
  
 }; 
@@ -2802,21 +2750,7 @@ window.addEventListener('load', function()
 	EzSidebarService.init();
 },
 false);
-window.addEventListener('load', function()
-{
-	if (EzSidebarService.activated) return;
 
-	EzSidebarService.init();
-},
-false);
-
-window.addEventListener('unload', function()
-{
-	if (!EzSidebarService.activated) return;
-
-	EzSidebarService.destruct();
-},
-false);
 window.addEventListener('unload', function()
 {
 	if (!EzSidebarService.activated) return;
