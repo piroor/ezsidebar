@@ -23,7 +23,7 @@
 		onload="ezsidebarUndockedStartup();"
 		onunload="ezsidebarUndockedShutdown();">
 
-<script type="application/x-javascript"><![CDATA[
+<script type="application/javascript"><![CDATA[
 try {
 	window.gBrowser = null;
 	window.content  = null;
@@ -147,6 +147,6 @@ function ezsidebarUndockedShutdown()
 </data>
 
 
-<script type="application/x-javascript" src="chrome://ezsidebar/content/overrideFunctions.js"/>
+<script type="application/javascript" src="chrome://ezsidebar/content/overrideFunctions.js"/>
 
 </window>

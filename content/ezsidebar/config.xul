@@ -76,11 +76,11 @@
 	</groupbox>
 </prefpane>
 
-<script type="application/x-javascript" src="prefs.js"/>
-<script type="application/x-javascript" src="globalOverlay.js"/>
-<script type="application/x-javascript" src="pRDFData.js"/>
+<script type="application/javascript" src="prefs.js"/>
+<script type="application/javascript" src="globalOverlay.js"/>
+<script type="application/javascript" src="pRDFData.js"/>
 
-<script type="application/x-javascript"><![CDATA[
+<script type="application/javascript"><![CDATA[
 function doRefresh()
 {
 	document.getElementById('ezsidebar.ezsidebar.staticPanels').valueFromPreferences = '';

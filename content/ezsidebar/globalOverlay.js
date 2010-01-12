@@ -1439,7 +1439,7 @@ var EzSidebarService =
 			mimeTypeIsTextBased : function(contentType)
 			{
 				return /^text\/|\+xml$/.test(contentType) ||
-					contentType == "application/x-javascript" ||
+					contentType == "application/javascript" ||
 					contentType == "application/xml" ||
 					contentType == "mozilla.application/cached-xul";
 			},
