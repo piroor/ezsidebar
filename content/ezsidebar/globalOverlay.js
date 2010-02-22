@@ -2778,43 +2778,29 @@ EzSidebarFavIconLoader.prototype = {
   
 // èâä˙âª 
 // initialize
-window.addEventListener('load', function()
-{
+window.addEventListener('load', function() {
+	window.removeEventListener('load', arguments.callee, false);
 	if (EzSidebarService.activated) return;
 
+	var cmd = EzSidebarService.sidebarBox.getAttribute('sidebarcommand');
+	if (cmd && cmd.match(/^ezsidebar:/) && document.getElementById(cmd))
+		EzSidebarService.sidebarBox.setAttribute('sidebarcommand', cmd);
+
 	EzSidebarService.init();
-},
-false);
+}, false);
 
-window.addEventListener('unload', function()
-{
+window.addEventListener('unload', function() {
+	window.removeEventListener('unload', arguments.callee, false);
 	if (!EzSidebarService.activated) return;
-
 	EzSidebarService.destruct();
-},
-false);
+}, false);
 	
-function EzSidebarOverrideStartupFunc() {
-	if (EzSidebarService.sidebarBox) { 
-		var funcName = ('BrowserStartup' in window && !('__ezsidebar__BrowserStartup' in window)) ? 'BrowserStartup' :
-				('Startup' in window && !('__ezsidebar__Startup' in window)) ? 'Startup' :
-				null ;
+window.addEventListener('DOMContentLoaded', function() {
+	window.removeEventListener('DOMContentLoaded', arguments.callee, false);
 
-		if (funcName) {
-			window['__ezsidebar__'+funcName] = window[funcName];
-			window[funcName] = function() {
-				// if the command item isn't generated yet, startup operation fails.
-				var cmd = EzSidebarService.sidebarBox.getAttribute('sidebarcommand');
-				if (cmd && (cmd.match(/^ezsidebar:/) || !document.getElementById(cmd)))
-					EzSidebarService.sidebarBox.setAttribute('sidebarcommand', '');
-
-				window['__ezsidebar__'+funcName]();
-
-				if (cmd && cmd.match(/^ezsidebar:/) && document.getElementById(cmd))
-					EzSidebarService.sidebarBox.setAttribute('sidebarcommand', cmd);
-			};
-		}
-	}
-}
-EzSidebarOverrideStartupFunc();
+	// if the command item isn't generated yet, startup operation fails.
+	var cmd = EzSidebarService.sidebarBox.getAttribute('sidebarcommand');
+	if (cmd && (cmd.match(/^ezsidebar:/) || !document.getElementById(cmd)))
+		EzSidebarService.sidebarBox.setAttribute('sidebarcommand', '');
+}, false);
   
