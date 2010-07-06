@@ -1926,7 +1926,7 @@ var EzSidebarService =
 			}
 
 			button = document.getElementById(this.isSidebarWindow ? 'template:sidebar-dock-button' : 'template:sidebar-undock-button' );
-			header.insertBefore(button.parentNode.removeChild(button), header.lastChild);
+			header.insertBefore(button, header.lastChild);
 			button.id = button.id.replace(/^template:/, '');
 		}
 		// print preview
