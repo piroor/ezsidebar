@@ -1900,7 +1900,7 @@ var EzSidebarService =
 
 			// for old Firebird
 			if ('contentAreaClick' in window &&
-				window.contentAreaClick.arity < 2) {
+				window.contentAreaClick.length < 2) {
 				window.__ezsidebar__contentAreaClick = window.contentAreaClick;
 				window.contentAreaClick = this.contentAreaClick;
 			}
