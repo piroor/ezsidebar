@@ -882,7 +882,8 @@ var EzSidebarService =
 	
 	addPanel : function(aURI, aTitle, aNoConfirm) 
 	{
-		if (!aURI || aURI == 'about:blank') {
+		if (!aURI ||
+			(window.isBlankPageURL ? isBlankPageURL(aURI) : (aURI == 'about:blank'))) {
 			return;
 		}
 
@@ -972,7 +973,7 @@ var EzSidebarService =
 				title : (this.hostWindow ? Components.lookupMethod(doc, 'title').call(doc) : null ),
 				add   : false
 			};
-		if (data.uri == 'about:blank') data.uri = null;
+		if (window.isBlankPageURL ? isBlankPageURL(data.uri) : (data.uri == 'about:blank')) data.uri = null;
 		window.openDialog(
 			'chrome://ezsidebar/content/addPanel.xul',
 			'_blank',
@@ -1428,7 +1429,7 @@ var EzSidebarService =
 
 				if (aWebProgress.DOMWindow == content) {
 					var location = aLocation.spec;
-					if (location == 'about:blank' || location == '') {
+					if ((window.isBlankPageURL ? isBlankPageURL(location) : (location == 'about:blank')) || location == '') {
 						this.reloadCommand.setAttribute('disabled', true);
 						this.reloadSkipCacheCommand.setAttribute('disabled', true);
 					} else {
