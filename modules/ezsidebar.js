@@ -505,9 +505,10 @@ EzSidebar.prototype = {
  
 	onFocused : function() 
 	{
-		if (EzSidebar.hidden || EzSidebar.switching)
+		if (!EzSidebar.shouldShowForLastWindow && (EzSidebar.panelHidden || EzSidebar.switching))
 			return;
 
+		EzSidebar.shouldShowForLastWindow = false;
 		EzSidebar.switching = true;
 
 		var current = this.window;
@@ -646,12 +647,16 @@ EzSidebar.prototype = {
 	onLoad : function()
 	{
 		this.window.removeEventListener('load', this, false);
+
 		if (!this.sidebarHidden)
 			this.showPanel();
 	},
  
 	destroy : function() 
 	{
+		if (this.browserWindows.length == 1 && !EzSidebar.panelHidden)
+			EzSidebar.shouldShowForLastWindow = true;
+
 		delete this.window.EzSidebarService;
 
 		this.window.removeEventListener('unload', this, false);
@@ -684,7 +689,7 @@ EzSidebar.prototype = {
  
 EzSidebar.instances = []; 
  
-EzSidebar.__defineGetter__('hidden', function() { 
+EzSidebar.__defineGetter__('panelHidden', function() { 
 	return EzSidebar.instances.every(function(aService) {
 		return aService.panelHidden;
 	});
