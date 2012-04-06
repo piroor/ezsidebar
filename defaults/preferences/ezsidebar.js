@@ -8,5 +8,4 @@ pref("extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.autoCollapse", false);
 pref("extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.autoCollapse.delay.expand", 250);
 pref("extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.autoCollapse.delay.collapse", 500);
 pref("extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.lastCommand", "");
-pref("extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.hideOnStartup", false);
 pref("extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.glass", true);

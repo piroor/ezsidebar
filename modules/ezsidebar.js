@@ -99,45 +99,11 @@ EzSidebar.prototype = {
  
 	get panel() 
 	{
-		if (this._panel)
-			return this._panel;
-
-		var panel = this.document.getElementById('ezsidebar-panel');
-
-		var style = <![CDATA[
-				#ezsidebar-resizer-left,
-				#ezsidebar-resizer-right,
-				#ezsidebar-resizer-top-left,
-				#ezsidebar-resizer-top-right,
-				#ezsidebar-resizer-bottom-left,
-				#ezsidebar-resizer-bottom-right {
-					width: %SIZE%px;
-				}
-				#ezsidebar-resizer-top,
-				#ezsidebar-resizer-bottom,
-				#ezsidebar-resizer-top-left,
-				#ezsidebar-resizer-top-right,
-				#ezsidebar-resizer-bottom-left,
-				#ezsidebar-resizer-bottom-right {
-					height: %SIZE%px;
-				}
-				#ezsidebar-resizer-outer-container {
-					margin:-%SIZE%px;
-				}
-			]]>.toString().replace(/%SIZE%/g, this.resizeArea);
-		var styleSheet = this.document.createProcessingInstruction('xml-stylesheet',
-			'type="text/css" href="data:text/css,'+encodeURIComponent(style)+'"');
-		this.document.insertBefore(styleSheet, this.document.documentElement);
-
-		if (this.glass)
-			panel.setAttribute('glass', true);
-		else
-			panel.removeAttribute('glass');
-
-		return this._panel = panel;
+		return this._panel ||
+				(this._panel = this.document.getElementById('ezsidebar-panel'));
 	},
  
-	get autoCollapseButton()
+	get autoCollapseButton() 
 	{
 		if (this._autoCollapseButton)
 			return this._autoCollapseButton;
@@ -151,16 +117,8 @@ EzSidebar.prototype = {
 
 		return this._autoCollapseButton = button;
 	},
-	updateAutoCollapseButton : function()
-	{
-		var button = this.autoCollapseButton;
-		if (this.autoCollapse)
-			button.removeAttribute('checked');
-		else
-			button.setAttribute('checked', true);
-	},
  
-	get glass()
+	get glass() 
 	{
 		return XULAppInfo.OS == 'WINNT' &&
 				prefs.getPref(this.domain + 'glass');
@@ -228,10 +186,16 @@ EzSidebar.prototype = {
 	},
 	set collapsed(aValue)
 	{
-		prefs.setPref(this.domain + 'collapsed', this.resizerBar.collapsed = this.sidebar.collasped = !!aValue);
+		prefs.setPref(this.domain + 'collapsed', this.UICollapsed = !!aValue);
 		return aValue;
 	},
- 
+	
+	set UICollapsed(aValue) 
+	{
+		this.resizerBar.collapsed = this.sidebar.collasped = !!aValue;
+		return aValue;
+	},
+  
 	get lastCommand() 
 	{
 		return this.sidebarBox.getAttribute('sidebarcommand');
@@ -254,6 +218,42 @@ EzSidebar.prototype = {
   
 	// event handling 
 	
+	observe : function(aSubject, aTopic, aData) 
+	{
+		if (aTopic != 'nsPref:changed')
+			return;
+
+		var prefName = aData.replace(this.domain, '');
+		switch (prefName)
+		{
+			case 'resizeArea':
+				return this.installStyleSheet();
+
+			case 'collapsed':
+				this.UICollapsed = prefs.getPref(aData);
+				this.updateSize();
+				return;
+
+			case 'autoCollapse':
+				return this.updateAutoCollapseButton();
+
+			case 'x':
+			case 'y':
+			case 'width':
+			case 'height':
+				if (!this.panelHidden) {
+					if (this._updateSizeAndPositionTimer)
+						this.window.clearTimeout(this._updateSizeAndPositionTimer);
+					this._updateSizeAndPositionTimer = this.window.setTimeout(function(aSelf) {
+						aSelf._updateSizeAndPositionTimer = null;
+						aSelf.updateSize();
+						aSelf.panel.moveTo(aSelf.x, aSelf.y);
+					}, 0, this);
+				}
+				return;
+		}
+	},
+ 
 	handleEvent : function(aEvent) 
 	{
 		switch(aEvent.type)
@@ -449,7 +449,6 @@ EzSidebar.prototype = {
 	onPopupShown : function(aEvent) 
 	{
 		this.panel.collapsed = false;
-
 		this.updateSize();
 	},
  
@@ -574,12 +573,8 @@ EzSidebar.prototype = {
 		return targetWindows;
 	},
   
-	toggleCollapsed : function() 
-	{
-		this.collapsed = !this.collapsed;
-		this.updateSize();
-	},
- 
+/* update UI */ 
+	
 	updateSize : function() 
 	{
 		if (this.collapsed)
@@ -588,6 +583,31 @@ EzSidebar.prototype = {
 			this.panel.sizeTo(this.width, this.height);
 	},
  
+	updateAutoCollapseButton : function() 
+	{
+		var button = this.autoCollapseButton;
+		if (this.autoCollapse)
+			button.removeAttribute('checked');
+		else
+			button.setAttribute('checked', true);
+	},
+  
+/* commands */ 
+	
+	toggleCollapsed : function() 
+	{
+		this.collapsed = !this.collapsed;
+		this.updateSize();
+	},
+ 
+	show : function() 
+	{
+		if (!this.sidebarHidden)
+			this.showPanel();
+		else
+			this.showSidebar();
+	},
+	
 	showPanel : function() 
 	{
 		if (!this.panelHidden)
@@ -601,7 +621,22 @@ EzSidebar.prototype = {
 			EzSidebar.lastCommand = aSelf.lastCommand;
 		}, 0, this);
 	},
-	hidePanel : function()
+ 
+	showSidebar : function() 
+	{
+		if (this.sidebarHidden)
+			this.window.toggleSidebar(EzSidebar.lastCommand);
+	},
+  
+	hide : function() 
+	{
+		if (this.sidebarHidden)
+			this.hidePanel();
+		else
+			this.hideSidebar();
+	},
+	
+	hidePanel : function() 
 	{
 		if (this.panelHidden)
 			return;
@@ -609,32 +644,12 @@ EzSidebar.prototype = {
 		this.panel.hidePopup();
 	},
  
-	showSidebar : function() 
-	{
-		if (this.sidebarHidden)
-			this.window.toggleSidebar(EzSidebar.lastCommand);
-	},
-	hideSidebar : function()
+	hideSidebar : function() 
 	{
 		if (!this.sidebarHidden)
 			this.window.toggleSidebar(this.lastCommand);
 	},
- 
-	show : function() 
-	{
-		if (!this.sidebarHidden)
-			this.showPanel();
-		else
-			this.showSidebar();
-	},
-	hide : function()
-	{
-		if (this.sidebarHidden)
-			this.hidePanel();
-		else
-			this.hideSidebar();
-	},
- 
+   
 	init : function() 
 	{
 		this.window.removeEventListener('DOMContentLoaded', this, false);
@@ -642,6 +657,13 @@ EzSidebar.prototype = {
 		var sidebarBox = this.sidebarBox;
 		this.document.getElementById('ezsidebar-resizer-container').appendChild(sidebarBox); // this automatically removes the box from the document tree and inserts under the panel
 		sidebarBox.setAttribute('flex', 1); // required to expand panel contents
+
+		if (this.glass)
+			this.panel.setAttribute('glass', true);
+		else
+			this.panel.removeAttribute('glass');
+
+		this.installStyleSheet();
 
 		this.header.addEventListener('dblclick', this, false);
 		this.panel.addEventListener('mousedown', this, true);
@@ -657,8 +679,11 @@ EzSidebar.prototype = {
 
 		this.window.addEventListener('load', this, false);
 		this.window.addEventListener('unload', this, false);
+
+		prefs.addPrefListener(this);
 	},
-	onLoad : function()
+	
+	onLoad : function() 
 	{
 		this.window.removeEventListener('load', this, false);
 
@@ -666,10 +691,53 @@ EzSidebar.prototype = {
 			this.showPanel();
 	},
  
+	installStyleSheet : function() 
+	{
+		this.uninstallStyleSheet();
+
+		var style = <![CDATA[
+				#ezsidebar-resizer-left,
+				#ezsidebar-resizer-right,
+				#ezsidebar-resizer-top-left,
+				#ezsidebar-resizer-top-right,
+				#ezsidebar-resizer-bottom-left,
+				#ezsidebar-resizer-bottom-right {
+					width: %SIZE%px;
+				}
+				#ezsidebar-resizer-top,
+				#ezsidebar-resizer-bottom,
+				#ezsidebar-resizer-top-left,
+				#ezsidebar-resizer-top-right,
+				#ezsidebar-resizer-bottom-left,
+				#ezsidebar-resizer-bottom-right {
+					height: %SIZE%px;
+				}
+				#ezsidebar-resizer-outer-container {
+					margin:-%SIZE%px;
+				}
+			]]>.toString().replace(/%SIZE%/g, this.resizeArea);
+		this.lastStyleSheet = this.document.createProcessingInstruction('xml-stylesheet',
+			'type="text/css" href="data:text/css,'+encodeURIComponent(style)+'"');
+		this.document.insertBefore(this.lastStyleSheet, this.document.documentElement);
+	},
+ 
+	uninstallStyleSheet : function() 
+	{
+		if (!this.lastStyleSheet)
+			return;
+
+		this.document.removeChild(this.lastStyleSheet);
+		delete this.lastStyleSheet;
+	},
+  
 	destroy : function() 
 	{
 		if (this.browserWindows.length == 1 && !EzSidebar.panelHidden)
 			EzSidebar.shouldShowForLastWindow = true;
+
+		prefs.removePrefListener(this);
+
+		this.uninstallStyleSheet();
 
 		delete this.window.EzSidebarService;
 
@@ -713,7 +781,7 @@ EzSidebar.__defineGetter__('panelHidden', function() {
 EzSidebar.__defineGetter__('lastCommand', function() { 
 	return prefs.getPref(EzSidebar.prototype.domain + 'lastCommand');
 });
-EzSidebar.__defineSetter__('lastCommand', function(aValue) { 
+EzSidebar.__defineSetter__('lastCommand', function(aValue) {
 	prefs.setPref(EzSidebar.prototype.domain + 'lastCommand', aValue);
 	return aValue;
 });
