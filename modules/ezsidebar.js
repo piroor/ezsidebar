@@ -40,6 +40,10 @@ Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
+
+const XULAppInfo = Cc['@mozilla.org/xre/app-info;1']
+					.getService(Ci.nsIXULAppInfo)
+					.QueryInterface(Ci.nsIXULRuntime);
  
 function EzSidebar(aWindow) 
 {
@@ -87,15 +91,56 @@ EzSidebar.prototype = {
 				(this._sidebar = this.document.getElementById('sidebar'));
 	},
  
+	get resizerBar() 
+	{
+		return this._resizerBar ||
+				(this._resizerBar = this.document.getElementById('ezsidebar-resizer-bar'));
+	},
+ 
 	get panel() 
 	{
 		if (this._panel)
 			return this._panel;
 
-		var panel = this.document.createElement('panel');
-		panel.setAttribute('id', 'ezsidebar-panel');
-		panel.setAttribute('noautohide', true); // required to keep the panel shown
-		this.document.documentElement.appendChild(panel);
+		var panel = this.document.getElementById('ezsidebar-panel');
+
+		var style = <![CDATA[
+				#ezsidebar-resizer-left,
+				#ezsidebar-resizer-right,
+				#ezsidebar-resizer-top,
+				#ezsidebar-resizer-bottom,
+				#ezsidebar-resizer-top-left,
+				#ezsidebar-resizer-top-right,
+				#ezsidebar-resizer-bottom-left,
+				#ezsidebar-resizer-bottom-right {
+					/* border: 1px solid red; */
+					position: relative;
+					z-index: 1000;
+				}
+				#ezsidebar-resizer-left,
+				#ezsidebar-resizer-right,
+				#ezsidebar-resizer-top-left,
+				#ezsidebar-resizer-top-right,
+				#ezsidebar-resizer-bottom-left,
+				#ezsidebar-resizer-bottom-right {
+					width: %SIZE%px;
+				}
+				#ezsidebar-resizer-top,
+				#ezsidebar-resizer-bottom,
+				#ezsidebar-resizer-top-left,
+				#ezsidebar-resizer-top-right,
+				#ezsidebar-resizer-bottom-left,
+				#ezsidebar-resizer-bottom-right {
+					height: %SIZE%px;
+				}
+				#ezsidebar-resizer-outer-container {
+					margin:-%SIZE%px;
+				}
+			]]>.toString().replace(/%SIZE%/g, this.resizeArea);
+		var styleSheet = this.document.createProcessingInstruction('xml-stylesheet',
+			'type="text/css" href="data:text/css,'+encodeURIComponent(style)+'"');
+		this.document.insertBefore(styleSheet, this.document.documentElement);
+
 		return this._panel = panel;
 	},
  
@@ -163,6 +208,11 @@ EzSidebar.prototype = {
 	{
 		return this.sidebarBox.getAttribute('sidebarcommand');
 	},
+ 
+	get resizeArea() 
+	{
+		return prefs.getPref(this.domain + 'resizeArea');
+	},
   
 	// event handling 
 	
@@ -217,28 +267,51 @@ EzSidebar.prototype = {
 			).singleNodeValue;
 		return clickable && clickable != this.panel;
 	},
-	isEventFiredOnResizer : function(aEvent)
+ 
+	getResizeOrientationFromEvent : function(aEvent)
 	{
 		var doc = aEvent.originalTarget.ownerDocument || aEvent.originalTarget;
 		var resizer = doc.evaluate(
-				'ancestor-or-self::*[contains(" resizer ", concat(" ", local-name(), " "))][1]',
+				'ancestor-or-self::*[@class="ezsidebar-resize-area"][1]',
 				aEvent.originalTarget,
 				null,
 				Ci.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE,
 				null
 			).singleNodeValue;
-		return resizer == this.resizer;
+		if (resizer) {
+			if (resizer.id.indexOf('left') > -1) orientation |= this.RESIZE_LEFT;
+			if (resizer.id.indexOf('right') > -1) orientation |= this.RESIZE_RIGHT;
+			if (resizer.id.indexOf('top') > -1) orientation |= this.RESIZE_TOP;
+			if (resizer.id.indexOf('bottom') > -1) orientation |= this.RESIZE_BOTTOM;
+			if (orientation)
+				return orientation;
+		}
+
+		var outer = this.panel.getOuterScreenRect();
+		var size = this.resizeArea;
+		var orientation = 0;
+		if (aEvent.screenX < outer.left + size) orientation |= this.RESIZE_LEFT;
+		if (aEvent.screenY < outer.top + size) orientation |= this.RESIZE_TOP;
+		if (aEvent.screenX > outer.left + outer.width - size) orientation |= this.RESIZE_RIGHT;
+		if (aEvent.screenY > outer.top + outer.height - size) orientation |= this.RESIZE_BOTTOM;
+		return orientation;
 	},
+	RESIZE_NONE   : 0,
+	RESIZE_TOP    : (1 << 0),
+	RESIZE_BOTTOM : (1 << 1),
+	RESIZE_LEFT   : (1 << 2),
+	RESIZE_RIGHT  : (1 << 3),
+	RESIZE_VERTICAL   : (1 << 0) | (1 << 1),
+	RESIZE_HORIZONTAL : (1 << 2) | (1 << 3),
 	
 	onMouseDown : function(aEvent) 
 	{
-		if (this.isEventFiredOnClickable(aEvent))
-			return;
+		var orientation = this.getResizeOrientationFromEvent(aEvent);
+		if (orientation)
+			return this.startResize(aEvent, orientation);
 
-		if (this.isEventFiredOnResizer(aEvent))
-			this.startResize(aEvent);
-		else
-			this.startMove(aEvent);
+		if (!this.isEventFiredOnClickable(aEvent))
+			return this.startMove(aEvent);
 	},
 	
 	startMove : function(aEvent) 
@@ -252,14 +325,16 @@ EzSidebar.prototype = {
 		aEvent.target.setCapture();
 	},
  
-	startResize : function(aEvent) 
+	startResize : function(aEvent, aOrientation) 
 	{
 		var outer = this.panel.getOuterScreenRect();
+		this.baseX = outer.left;
+		this.baseY = outer.top;
 		this.baseWidth = outer.width;
 		this.baseHeight = outer.height;
 		this.startX = aEvent.screenX;
 		this.startY = aEvent.screenY;
-		this.resizing = true;
+		this.resizing = aOrientation;
 		aEvent.preventDefault();
 		aEvent.stopPropagation();
 		aEvent.target.setCapture();
@@ -279,11 +354,47 @@ EzSidebar.prototype = {
 		}
 		else if (this.resizing) {
 			this.repositioning = true;
-			this.panel.sizeTo(this.width = this.baseWidth + dX,
-								this.height = this.baseHeight + dY);
+			let x = this.baseX;
+			let y = this.baseY;
+
+			if (this.resizing & this.RESIZE_TOP)
+				y += dY;
+
+			if (this.resizing & this.RESIZE_LEFT)
+				x += dX;
+
+			if (x != this.baseX || y != this.baseY)
+				this.panel.moveTo(this.x = x, this.y = y);
+
+			let width = this.baseWidth;
+			let height = this.baseHeight;
+
+			if (this.resizing & this.RESIZE_LEFT)
+				width -= dX;
+			else if (this.resizing & this.RESIZE_RIGHT)
+				width += dX;
+
+			if (this.resizing & this.RESIZE_TOP)
+				height -= dY;
+			else if (this.resizing & this.RESIZE_BOTTOM)
+				height += dY;
+
+			if (width != this.baseWidth || height != this.baseHeight) {
+				if (this.requireResizeHeight && height == this.baseHeight) {
+					this.flip ^= 1;
+					height += this.flip;
+				}
+				this.panel.sizeTo(this.width = Math.max(width, this.minWidth),
+									this.height = Math.max(height, this.minHeight));
+			}
+
  			this.window.setTimeout(function(aSelf) { aSelf.repositioning = false; }, 0, this);
 		}
 	},
+	flip : 1,
+	minWidth : 16,
+	minHeight : 16,
+	requireResizeHeight : XULAppInfo.OS == 'Linux',
  
 	onMouseUp : function(aEvent) 
 	{
@@ -291,7 +402,7 @@ EzSidebar.prototype = {
 			return;
 
 		this.moving = false;
-		this.resizing = false;
+		this.resizing = this.RESIZE_NONE;
 		aEvent.target.releaseCapture();
 	},
  
@@ -407,13 +518,8 @@ EzSidebar.prototype = {
 		this.window.removeEventListener('DOMContentLoaded', this, false);
 
 		var sidebarBox = this.sidebarBox;
-		this.panel.appendChild(sidebarBox); // this automatically removes the box from the document tree and inserts under the panel
+		this.document.getElementById('ezsidebar-resizer-container').appendChild(sidebarBox); // this automatically removes the box from the document tree and inserts under the panel
 		sidebarBox.setAttribute('flex', 1); // required to expand panel contents
-
-		this.resizerBar = this.document.createElement('hbox');
-		this.resizerBar.appendChild(this.document.createElement('spacer')).setAttribute('flex', 1);
-		this.resizer = this.resizerBar.appendChild(this.document.createElement('resizer'));
-		this.panel.appendChild(this.resizerBar);
 
 		this.header.addEventListener('dblclick', this, false);
 		this.panel.addEventListener('mousedown', this, true);
@@ -451,8 +557,7 @@ EzSidebar.prototype = {
 		delete this._sidebar;
 		delete this._header;
 		delete this._panel;
-		delete this.resizer;
-		delete this.resizerBar;
+		delete this._resizerBar;
 		delete this.window;
 
 		var index = EzSidebar.instances.indexOf(this);

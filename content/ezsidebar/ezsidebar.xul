@@ -2,6 +2,61 @@
 <?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://ezsidebar/locale/">
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<popupset id="mainPopupSet">
+	<panel id="ezsidebar-panel"
+		noautohide="true"
+		style="position:relative;">
+		<grid flex="1">
+			<columns>
+				<column/>
+				<column flex="1"/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<spacer id="ezsidebar-resizer-top-left"
+						class="ezsidebar-resize-area"
+						style="cursor: nw-resize;"/>
+					<spacer id="ezsidebar-resizer-top"
+						class="ezsidebar-resize-area"
+						style="cursor: n-resize;"/>
+					<spacer id="ezsidebar-resizer-top-right"
+						class="ezsidebar-resize-area"
+						style="cursor: ne-resize;"/>
+				</row>
+				<row flex="1">
+					<spacer id="ezsidebar-resizer-left"
+						class="ezsidebar-resize-area"
+						style="cursor: w-resize;"/>
+					<vbox id="ezsidebar-resizer-outer-container"
+						style="position:relative;">
+						<vbox id="ezsidebar-resizer-container" flex="1">
+						</vbox>
+						<hbox id="ezsidebar-resizer-bar">
+							<spacer flex="1"/>
+							<resizer id="ezsidebar-master-resizer-bottom-right"
+								class="ezsidebar-resize-area"/>
+						</hbox>
+					</vbox>
+					<spacer id="ezsidebar-resizer-right"
+						class="ezsidebar-resize-area"
+						style="cursor: e-resize;"/>
+				</row>
+				<row>
+					<spacer id="ezsidebar-resizer-bottom-left"
+						class="ezsidebar-resize-area"
+						style="cursor: sw-resize;"/>
+					<spacer id="ezsidebar-resizer-bottom"
+						class="ezsidebar-resize-area"
+						style="cursor: s-resize;"/>
+					<spacer id="ezsidebar-resizer-bottom-right"
+						class="ezsidebar-resize-area"
+						style="cursor: se-resize;"/>
+				</row>
+			</rows>
+		</grid>
+	</panel>
+</popupset>
 <script type="application/javascript"><![CDATA[
 (function() {
 	var ns = {};
