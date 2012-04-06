@@ -2,6 +2,11 @@
 <?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://ezsidebar/locale/">
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<stringbundleset id="stringbundleset">
+	<stringbundle id="ezsidebar-stringbundle" src="chrome://ezsidebar/locale/ezsidebar.properties"/>
+</stringbundleset>
+
 <popupset id="mainPopupSet">
 	<panel id="ezsidebar-panel"
 		noautohide="true"
@@ -57,6 +62,7 @@
 		</grid>
 	</panel>
 </popupset>
+
 <script type="application/javascript"><![CDATA[
 (function() {
 	var ns = {};
@@ -64,4 +70,5 @@
 	new ns.EzSidebar(window);
 })();
 ]]></script>
+
 </overlay>

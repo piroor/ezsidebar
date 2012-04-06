@@ -144,6 +144,35 @@ EzSidebar.prototype = {
 		return this._panel = panel;
 	},
  
+	get autoCollapseButton()
+	{
+		if (this._autoCollapseButton)
+			return this._autoCollapseButton;
+
+		var button = this.document.createElement('toolbarbutton');
+		button.setAttribute('id', 'ezsidebar-autocollapse-button');
+		button.setAttribute('type', 'checkbox');
+		button.setAttribute('autoCheck', 'false');
+		button.setAttribute('tooltiptext', this.bundle.getString('autoCollapse.tooltiptext'));
+		this.header.insertBefore(button, this.header.firstChild);
+
+		return this._autoCollapseButton = button;
+	},
+	updateAutoCollapseButton : function()
+	{
+		var button = this.autoCollapseButton;
+		if (this.autoCollapse)
+			button.removeAttribute('checked');
+		else
+			button.setAttribute('checked', true);
+	},
+ 
+	get bundle() 
+	{
+		return this._bundle ||
+				(this._bundle = this.document.getElementById('ezsidebar-stringbundle'));
+	},
+ 
 	get x() 
 	{
 		return prefs.getPref(this.domain + 'x');
@@ -214,9 +243,14 @@ EzSidebar.prototype = {
 		return prefs.getPref(this.domain + 'resizeArea');
 	},
  
-	get autoCollapse()
+	get autoCollapse() 
 	{
 		return prefs.getPref(this.domain + 'autoCollapse');
+	},
+	set autoCollapse(aValue)
+	{
+		prefs.setPref(this.domain + 'autoCollapse', !!aValue);
+		return aValue;
 	},
   
 	// event handling 
@@ -253,6 +287,9 @@ EzSidebar.prototype = {
 
 			case 'focus':
 				return this.onFocused();
+
+			case 'command':
+				return this.onCommand(aEvent);
 
 			default:
 				break;
@@ -483,6 +520,12 @@ EzSidebar.prototype = {
 
 		this.window.setTimeout(function() { EzSidebar.switching = false; }, 0);
 	},
+ 
+	onCommand : function(aEvent) 
+	{
+		this.autoCollapse = !this.autoCollapse;
+		this.updateAutoCollapseButton();
+	},
    
 	// XPConnect 
 	
@@ -537,6 +580,7 @@ EzSidebar.prototype = {
 			return;
 
 		this.collapsed = this.collapsed;
+		this.updateAutoCollapseButton();
 		this.panel.openPopupAtScreen(this.x, this.y, false);
 
 		this.window.setTimeout(function(aSelf) { // with All-in-One Sidebar, we have to do it with delay.
@@ -594,6 +638,7 @@ EzSidebar.prototype = {
 		this.panel.addEventListener('mouseout', this, true);
 		this.sidebarBox.addEventListener('DOMAttrModified', this, false);
 		this.window.addEventListener('focus', this, true);
+		this.autoCollapseButton.addEventListener('command', this, false);
 
 		this.window.addEventListener('load', this, false);
 		this.window.addEventListener('unload', this, false);
@@ -620,12 +665,15 @@ EzSidebar.prototype = {
 		this.panel.removeEventListener('mouseout', this, true);
 		this.sidebarBox.removeEventListener('DOMAttrModified', this, false);
 		this.window.removeEventListener('focus', this, true);
+		this.autoCollapseButton.removeEventListener('command', this, false);
 
 		delete this._sidebarBox;
 		delete this._sidebar;
 		delete this._header;
 		delete this._panel;
 		delete this._resizerBar;
+		delete this._autoCollapseButton;
+		delete this._bundle;
 		delete this.window;
 
 		var index = EzSidebar.instances.indexOf(this);

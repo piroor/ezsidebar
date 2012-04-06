@@ -4,6 +4,15 @@
 	visibility: collapse !important;
 }
 
+#ezsidebar-autocollapse-button {
+	list-style-image: url("pin.png");
+	-moz-image-region: rect(0, 16px, 16px, 0);
+}
+
+#ezsidebar-autocollapse-button[checked="true"] {
+	-moz-image-region: rect(0, 32px, 16px, 16px);
+}
+
 /*
 	Hack for Optimoz Tweaks or others:
 
