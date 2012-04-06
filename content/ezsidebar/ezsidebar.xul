@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
+<?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar-aero.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://ezsidebar/locale/">
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
@@ -9,8 +10,8 @@
 
 <popupset id="mainPopupSet">
 	<panel id="ezsidebar-panel"
-		noautohide="true"
-		style="position:relative;">
+		collapsed="true"
+		noautohide="true">
 		<grid flex="1">
 			<columns>
 				<column/>
@@ -35,8 +36,7 @@
 						style="cursor: w-resize;"/>
 					<vbox id="ezsidebar-resizer-outer-container"
 						style="position:relative;">
-						<vbox id="ezsidebar-resizer-container" flex="1">
-						</vbox>
+						<vbox id="ezsidebar-resizer-container" flex="1"/>
 						<hbox id="ezsidebar-resizer-bar">
 							<spacer flex="1"/>
 							<resizer id="ezsidebar-master-resizer-bottom-right"

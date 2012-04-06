@@ -40,6 +40,10 @@ Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
+
+const XULAppInfo = Cc['@mozilla.org/xre/app-info;1']
+					.getService(Ci.nsIXULAppInfo)
+					.QueryInterface(Ci.nsIXULRuntime);
  
 function EzSidebar(aWindow) 
 {
@@ -103,18 +107,6 @@ EzSidebar.prototype = {
 		var style = <![CDATA[
 				#ezsidebar-resizer-left,
 				#ezsidebar-resizer-right,
-				#ezsidebar-resizer-top,
-				#ezsidebar-resizer-bottom,
-				#ezsidebar-resizer-top-left,
-				#ezsidebar-resizer-top-right,
-				#ezsidebar-resizer-bottom-left,
-				#ezsidebar-resizer-bottom-right {
-					/* border: 1px solid red; */
-					position: relative;
-					z-index: 1000;
-				}
-				#ezsidebar-resizer-left,
-				#ezsidebar-resizer-right,
 				#ezsidebar-resizer-top-left,
 				#ezsidebar-resizer-top-right,
 				#ezsidebar-resizer-bottom-left,
@@ -136,6 +128,11 @@ EzSidebar.prototype = {
 		var styleSheet = this.document.createProcessingInstruction('xml-stylesheet',
 			'type="text/css" href="data:text/css,'+encodeURIComponent(style)+'"');
 		this.document.insertBefore(styleSheet, this.document.documentElement);
+
+		if (this.glass)
+			panel.setAttribute('glass', true);
+		else
+			panel.removeAttribute('glass');
 
 		return this._panel = panel;
 	},
@@ -161,6 +158,12 @@ EzSidebar.prototype = {
 			button.removeAttribute('checked');
 		else
 			button.setAttribute('checked', true);
+	},
+ 
+	get glass()
+	{
+		return XULAppInfo.OS == 'WINNT' &&
+				prefs.getPref(this.domain + 'glass');
 	},
  
 	get bundle() 
@@ -271,7 +274,9 @@ EzSidebar.prototype = {
 				return this.onMouseUp(aEvent);
 
 			case 'popupshown':
-				return this.updateSize();
+				return this.onPopupShown();
+			case 'popuphiding':
+				return this.onPopupHiding();
 
 			case 'mouseover':
 				return this.onMouseOver(aEvent);
@@ -439,6 +444,18 @@ EzSidebar.prototype = {
 		this.moving = false;
 		this.resizing = this.RESIZE_NONE;
 		aEvent.target.releaseCapture();
+	},
+ 
+	onPopupShown : function(aEvent) 
+	{
+		this.panel.collapsed = false;
+
+		this.updateSize();
+	},
+ 
+	onPopupHiding : function(aEvent) 
+	{
+		this.panel.collapsed = true;
 	},
  
 	onMouseOver : function(aEvent) 
@@ -631,6 +648,7 @@ EzSidebar.prototype = {
 		this.panel.addEventListener('mousemove', this, true);
 		this.panel.addEventListener('mouseup', this, true);
 		this.panel.addEventListener('popupshown', this, false);
+		this.panel.addEventListener('popuphiding', this, false);
 		this.panel.addEventListener('mouseover', this, true);
 		this.panel.addEventListener('mouseout', this, true);
 		this.sidebarBox.addEventListener('DOMAttrModified', this, false);
@@ -662,6 +680,7 @@ EzSidebar.prototype = {
 		this.panel.removeEventListener('mousemove', this, true);
 		this.panel.removeEventListener('mouseup', this, true);
 		this.panel.removeEventListener('popupshown', this, false);
+		this.panel.removeEventListener('popuphiding', this, false);
 		this.panel.removeEventListener('mouseover', this, true);
 		this.panel.removeEventListener('mouseout', this, true);
 		this.sidebarBox.removeEventListener('DOMAttrModified', this, false);

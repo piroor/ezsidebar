@@ -1,5 +1,18 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+#ezsidebar-resizer-left,
+#ezsidebar-resizer-right,
+#ezsidebar-resizer-top,
+#ezsidebar-resizer-bottom,
+#ezsidebar-resizer-top-left,
+#ezsidebar-resizer-top-right,
+#ezsidebar-resizer-bottom-left,
+#ezsidebar-resizer-bottom-right {
+	/* border: 1px solid red; */
+	position: relative;
+	z-index: 1000;
+}
+
 #sidebar-splitter {
 	visibility: collapse !important;
 }
