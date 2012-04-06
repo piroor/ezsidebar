@@ -436,11 +436,19 @@ EzSidebar.prototype = {
  
 }; 
  
-EzSidebar.instances = [];
+EzSidebar.instances = []; 
  
 EzSidebar.__defineGetter__('hidden', function() { 
 	return EzSidebar.instances.every(function(aService) {
 		return aService.panelHidden;
 	});
+});
+ 
+EzSidebar.__defineGetter__('lastCommand', function() { 
+	return prefs.getPref(EzSidebar.prototype.domain + 'lastCommand');
+});
+EzSidebar.__defineSetter__('lastCommand', function(aValue) { 
+	prefs.setPref(EzSidebar.prototype.domain + 'lastCommand', aValue);
+	return aValue;
 });
   
