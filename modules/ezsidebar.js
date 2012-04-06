@@ -12,6 +12,7 @@ function EzSidebar(aWindow)
 
 	aWindow.addEventListener('DOMContentLoaded', this, false);
 	aWindow.EzSidebarService = this;
+	EzSidebar.instances.push(this);
 }
 EzSidebar.prototype = {
 	domain : 'extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.',
@@ -37,12 +38,6 @@ EzSidebar.prototype = {
 	{
 		return this._sidebarBox ||
 				(this._sidebarBox = this.document.getElementById('sidebar-box'));
-	},
- 
-	get splitter() 
-	{
-		return this._splitter ||
-				(this._splitter = this.document.getElementById('sidebar-splitter'));
 	},
  
 	get header() 
@@ -109,9 +104,14 @@ EzSidebar.prototype = {
 		return aValue;
 	},
  
-	get hidden() 
+	get sidebarHidden() 
 	{
 		return this.sidebarBox.hidden || this.sidebarBox.collapsed;
+	},
+ 
+	get panelHidden() 
+	{
+		return this.panel.state != 'open';
 	},
  
 	get collapsed() 
@@ -122,6 +122,11 @@ EzSidebar.prototype = {
 	{
 		prefs.setPref(this.domain + 'collapsed', this.resizerBar.collapsed = this.sidebar.collasped = !!aValue);
 		return aValue;
+	},
+ 
+	get lastCommand() 
+	{
+		return this.sidebarBox.getAttribute('sidebarcommand');
 	},
   
 	// event handling 
@@ -150,8 +155,12 @@ EzSidebar.prototype = {
 
 			case 'DOMAttrModified':
 				if (aEvent.originalTarget == this.sidebarBox &&
-					(aEvent.attrName == 'hidden' || aEvent.attrName == 'collapsed'))
-					this.showHidePanel(this.hidden);
+					(aEvent.attrName == 'hidden' || aEvent.attrName == 'collapsed')) {
+					if (this.sidebarHidden)
+						this.hidePanel();
+					else
+						this.showPanel();
+				}
 				return;
 
 			case 'focus':
@@ -226,13 +235,20 @@ EzSidebar.prototype = {
  
 	onFocused : function() 
 	{
-		if (this.hidden)
+		if (EzSidebar.hidden || EzSidebar.switching)
 			return;
 
-		var current = this.browserWindow;
+		EzSidebar.switching = true;
+
+		var current = this.window;
 		this.browserWindows.forEach(function(aWindow) {
-			aWindow.EzSidebarService.showHidePanel(aWindow == current);
+			if (aWindow == current)
+				aWindow.EzSidebarService.show();
+			else
+				aWindow.EzSidebarService.hide();
 		}, this);
+
+		this.window.setTimeout(function() { EzSidebar.switching = false; }, 0);
 	},
    
 	// XPConnect 
@@ -259,7 +275,7 @@ EzSidebar.prototype = {
 	getWindowsOf : function(aWindowType) 
 	{
 		var targetWindows = [];
-		var targets = this.WindowManager.getEnumerator(aWindowType, true);
+		var targets = this.WindowManager.getEnumerator(aWindowType);
 		while (targets.hasMoreElements())
 		{
 			let target = targets.getNext().QueryInterface(Ci.nsIDOMWindow);
@@ -282,16 +298,46 @@ EzSidebar.prototype = {
 			this.panel.sizeTo(this.width, this.height);
 	},
  
-	showHidePanel : function(aShow) 
+	showPanel : function() 
 	{
-		var panel = this.panel;
-		if (aShow)
-			panel.hidePopup();
-		else
-			panel.openPopupAtScreen(this.x, this.y, false);
+		if (!this.panelHidden)
+			return;
 
-		// we have to do it after the splitter was shown completely.
-		this.window.setTimeout(function(aSelf) { aSelf.splitter.hidden = true; }, 0, this);
+		this.panel.openPopupAtScreen(this.x, this.y, false);
+		EzSidebar.lastCommand = this.lastCommand;
+	},
+	hidePanel : function()
+	{
+		if (this.panelHidden)
+			return;
+
+		this.panel.hidePopup();
+	},
+ 
+	showSidebar : function() 
+	{
+		if (this.sidebarHidden)
+			this.window.toggleSidebar(EzSidebar.lastCommand);
+	},
+	hideSidebar : function()
+	{
+		if (!this.sidebarHidden)
+			this.window.toggleSidebar(this.lastCommand);
+	},
+ 
+	show : function() 
+	{
+		if (!this.sidebarHidden)
+			this.showPanel();
+		else
+			this.showSidebar();
+	},
+	hide : function()
+	{
+		if (this.sidebarHidden)
+			this.hidePanel();
+		else
+			this.hideSidebar();
 	},
  
 	init : function() 
@@ -314,7 +360,7 @@ EzSidebar.prototype = {
 		this.panel.addEventListener('mouseup', this, false);
 		this.panel.addEventListener('popupshown', this, false);
 		this.sidebarBox.addEventListener('DOMAttrModified', this, false);
-//		this.window.addEventListener('focus', this, false);
+		this.window.addEventListener('focus', this, true);
 
 		this.window.addEventListener('load', this, false);
 		this.window.addEventListener('unload', this, false);
@@ -322,8 +368,8 @@ EzSidebar.prototype = {
 	onLoad : function()
 	{
 		this.window.removeEventListener('load', this, false);
-		if (!this.hidden)
-			this.showHidePanel(true);
+		if (!this.sidebarHidden)
+			this.showPanel();
 	},
  
 	destroy : function() 
@@ -339,18 +385,27 @@ EzSidebar.prototype = {
 		this.panel.removeEventListener('mouseup', this, false);
 		this.panel.removeEventListener('popupshown', this, false);
 		this.sidebarBox.removeEventListener('DOMAttrModified', this, false);
-//		this.window.removeEventListener('focus', this, false);
+		this.window.removeEventListener('focus', this, true);
 
 		delete this._sidebarBox;
 		delete this._sidebar;
 		delete this._header;
-		delete this._splitter;
 		delete this._panel;
 		delete this.resizer;
 		delete this.resizerBar;
 		delete this.window;
-	}
 
+		var index = EzSidebar.instances.indexOf(this);
+		EzSidebar.instances.splice(index, 1);
+	}
  
 }; 
+ 
+EzSidebar.instances = [];
+ 
+EzSidebar.__defineGetter__('hidden', function() { 
+	return EzSidebar.instances.every(function(aService) {
+		return aService.panelHidden;
+	});
+});
   
