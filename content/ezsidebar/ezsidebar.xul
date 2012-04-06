@@ -11,7 +11,9 @@
 <popupset id="mainPopupSet">
 	<panel id="ezsidebar-panel"
 		collapsed="true"
-		noautohide="true">
+		noautofocus="true"
+		noautohide="true"
+		norestorefocus="true">
 		<grid flex="1">
 			<columns>
 				<column/>

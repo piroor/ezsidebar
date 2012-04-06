@@ -37,6 +37,7 @@ const EXPORTED_SYMBOLS = ['EzSidebar'];
 
 Components.utils.import('resource://ezsidebar-modules/prefs.js');
 Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
+Components.utils.import('resource://ezsidebar-modules/jsdeferred.js');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
@@ -177,7 +178,7 @@ EzSidebar.prototype = {
  
 	get panelHidden() 
 	{
-		return this.panel.state != 'open';
+		return !this.panel || this.panel.state != 'open';
 	},
  
 	get collapsed() 
@@ -215,6 +216,35 @@ EzSidebar.prototype = {
 		prefs.setPref(this.domain + 'autoCollapse', !!aValue);
 		return aValue;
 	},
+ 
+	waitDOMEvent : function(aTarget)
+	{
+		var deferred = new Deferred();
+		var eventTypes = Array.slice(arguments, 1);
+
+		var handleEvent = function(aEvent) {
+				eventTypes.forEach(function(aType) {
+					aTarget.removeEventListener(aType, handleEvent, true);
+				});
+				if (timer) timer.cancel();
+				deferred.call();
+			};
+
+		eventTypes.forEach(function(aType) {
+			aTarget.addEventListener(aType, handleEvent, true);
+		});
+
+		// timeout (for safety)
+		let timer = Deferred.wait(0.5);
+		timer
+			.next(function() {
+				timer = null;
+				handleEvent();
+			})
+			.error(this.defaultHandleError);
+
+		return deferred;
+	},
   
 	// event handling 
 	
@@ -243,12 +273,13 @@ EzSidebar.prototype = {
 			case 'height':
 				if (!this.panelHidden) {
 					if (this._updateSizeAndPositionTimer)
-						this.window.clearTimeout(this._updateSizeAndPositionTimer);
-					this._updateSizeAndPositionTimer = this.window.setTimeout(function(aSelf) {
-						aSelf._updateSizeAndPositionTimer = null;
-						aSelf.updateSize();
-						aSelf.panel.moveTo(aSelf.x, aSelf.y);
-					}, 0, this);
+						this._updateSizeAndPositionTimer.cancel();
+					let self = this;
+					this._updateSizeAndPositionTimer = Deferred.next(function() {
+						self._updateSizeAndPositionTimer = null;
+						self.updateSize();
+						self.panel.moveTo(self.x, self.y);
+					});
 				}
 				return;
 		}
@@ -260,6 +291,8 @@ EzSidebar.prototype = {
 		{
 			case 'DOMContentLoaded':
 				return this.init();
+			case 'load':
+				return this.initWithDelay();
 			case 'unload':
 				return this.destroy();
 
@@ -274,9 +307,9 @@ EzSidebar.prototype = {
 				return this.onMouseUp(aEvent);
 
 			case 'popupshown':
-				return this.onPopupShown();
+				return this.onPopupShown(aEvent);
 			case 'popuphiding':
-				return this.onPopupHiding();
+				return this.onPopupHiding(aEvent);
 
 			case 'mouseover':
 				return this.onMouseOver(aEvent);
@@ -286,8 +319,8 @@ EzSidebar.prototype = {
 			case 'DOMAttrModified':
 				return this.onDOMAttrModified(aEvent);
 
-			case 'focus':
-				return this.onFocused();
+			case 'activate':
+				return this.onActivated(aEvent);
 
 			case 'command':
 				return this.onCommand(aEvent);
@@ -390,7 +423,8 @@ EzSidebar.prototype = {
 			this.repositioning = true;
 			this.panel.moveTo(this.x = this.baseX + dX,
 								this.y = this.baseY + dY);
- 			this.window.setTimeout(function(aSelf) { aSelf.repositioning = false; }, 0, this);
+			let self = this;
+ 			Deferred.next(function() { self.repositioning = false; });
 		}
 		else if (this.resizing) {
 			this.repositioning = true;
@@ -428,7 +462,8 @@ EzSidebar.prototype = {
 									this.height = Math.max(height, this.minHeight));
 			}
 
- 			this.window.setTimeout(function(aSelf) { aSelf.repositioning = false; }, 0, this);
+			let self = this;
+ 			Deferred.next(function() { self.repositioning = false; });
 		}
 	},
 	flip : 1,
@@ -448,6 +483,7 @@ EzSidebar.prototype = {
  
 	onPopupShown : function(aEvent) 
 	{
+		this.panel.popupBoxObject.setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_NO_CONSUME);
 		this.panel.collapsed = false;
 		this.updateSize();
 	},
@@ -463,11 +499,14 @@ EzSidebar.prototype = {
 		if (!this.autoCollapse)
 			return;
 
-		this._autoExpandTimer = this.window.setTimeout(function(aSelf) {
-			aSelf._autoExpandTimer = null;
-			if (aSelf.hover && aSelf.collapsed)
-				aSelf.toggleCollapsed();
-		}, prefs.getPref(this.domain + 'autoCollapse.delay.expand'), this);
+		var self = this;
+		this._autoExpandTimer = Deferred
+			.wait(prefs.getPref(this.domain + 'autoCollapse.delay.expand') / 1000)
+			.next(function() {
+				self._autoExpandTimer = null;
+				if (self.hover && self.collapsed)
+					self.toggleCollapsed();
+			});
 	},
 	_autoExpandTimer : null,
  
@@ -477,20 +516,23 @@ EzSidebar.prototype = {
 		if (!this.autoCollapse)
 			return;
 
-		this.window.setTimeout(function(aSelf) {
-			if (!aSelf.hover && aSelf._autoExpandTimer) {
-				aSelf.window.clearTimeout(aSelf._autoExpandTimer);
-				aSelf._autoExpandTimer = null;
+		var self = this;
+		Deferred.next(function() {
+			if (!self.hover && self._autoExpandTimer) {
+				self._autoExpandTimer.cancel();
+				self._autoExpandTimer = null;
 			}
 		}, 0, this);
 
 		if (this._autoCollapseTimer)
-			this.window.clearTimeout(this._autoCollapseTimer);
-		this._autoCollapseTimer = this.window.setTimeout(function(aSelf) {
-			aSelf._autoCollapseTimer = null;
-			if (!aSelf.hover && !aSelf.collapsed)
-				aSelf.toggleCollapsed();
-		}, prefs.getPref(this.domain + 'autoCollapse.delay.collapse'), this);
+			this._autoCollapseTimer.cancel();
+		this._autoCollapseTimer = Deferred
+			.wait(prefs.getPref(this.domain + 'autoCollapse.delay.collapse') / 1000)
+			.next(function() {
+				self._autoCollapseTimer = null;
+				if (!self.hover && !self.collapsed)
+					self.toggleCollapsed();
+			});
 	},
 	_autoCollapseTimer : null,
  
@@ -515,23 +557,58 @@ EzSidebar.prototype = {
 		}
 	},
  
-	onFocused : function() 
+	onActivated : function() 
 	{
-		if (!EzSidebar.shouldShowForLastWindow && (EzSidebar.panelHidden || EzSidebar.switching))
+		if (
+			!EzSidebar.shouldShowForLastWindow &&
+			(EzSidebar.panelHidden || EzSidebar.switching)
+			)
 			return;
 
 		EzSidebar.shouldShowForLastWindow = false;
 		EzSidebar.switching = true;
 
 		var current = this.window;
-		this.browserWindows.forEach(function(aWindow) {
-			if (aWindow == current)
-				aWindow.EzSidebarService.show();
-			else
-				aWindow.EzSidebarService.hide();
-		}, this);
 
-		this.window.setTimeout(function() { EzSidebar.switching = false; }, 0);
+		var fm = Cc['@mozilla.org/focus-manager;1'].getService(Ci.nsIFocusManager);
+		var focusedWindow = {};
+		var focusedElement;
+		var flags;
+
+		var self = this;
+		this.show()
+			.next(function() {
+				// now the panel is showing...
+				focusedWindow = {};
+				focusedElement = fm.getFocusedElementForWindow(current, true, focusedWindow);
+				var reason = fm.getLastFocusMethod(focusedWindow.value);
+				flags = Ci.nsIFocusManager.FLAG_RAISE |
+							Ci.nsIFocusManager.FLAG_NOSCROLL |
+							Ci.nsIFocusManager.FLAG_NOSWITCHFRAME |
+							reason;
+			})
+			.next(function() {
+				// completely shown.
+				var deferreds = [];
+				self.browserWindows.forEach(function(aWindow) {
+					if (aWindow != current)
+						deferreds.push(aWindow.EzSidebarService.hide());
+				}, this);
+
+				focusedWindow.value.focus();
+
+				if (deferreds.length)
+					return Deferred.parallel(deferreds);
+			})
+			.error(function(e) {
+				dump(e+'\n'+e.stack+'\n');
+			})
+			.next(function() {
+				if (focusedElement)
+					fm.setFocus(focusedElement, flags);
+
+				EzSidebar.switching = false;
+			});
 	},
  
 	onCommand : function(aEvent) 
@@ -603,51 +680,64 @@ EzSidebar.prototype = {
 	show : function() 
 	{
 		if (!this.sidebarHidden)
-			this.showPanel();
+			return this.showPanel();
 		else
-			this.showSidebar();
+			return this.showSidebar();
 	},
 	
 	showPanel : function() 
 	{
 		if (!this.panelHidden)
-			return;
+			return Deferred.next(function() {});
 
 		this.collapsed = this.collapsed;
 		this.updateAutoCollapseButton();
 		this.panel.openPopupAtScreen(this.x, this.y, false);
 
-		this.window.setTimeout(function(aSelf) { // with All-in-One Sidebar, we have to do it with delay.
-			EzSidebar.lastCommand = aSelf.lastCommand;
-		}, 0, this);
+		var self = this;
+		Deferred.next(function() { // with All-in-One Sidebar, we have to do it with delay.
+			if (self.lastCommand)
+				EzSidebar.lastCommand = self.lastCommand;
+		});
+
+		return this.waitDOMEvent(this.panel, 'popupshown');
 	},
  
 	showSidebar : function() 
 	{
-		if (this.sidebarHidden)
-			this.window.toggleSidebar(EzSidebar.lastCommand);
+		if (!this.sidebarHidden)
+			return Deferred.next(function() {});
+
+		this.window.toggleSidebar(EzSidebar.lastCommand || prefs.getPref(this.domain + 'defaultCommand'));
+
+		return this.waitDOMEvent(this.sidebar, 'load', 'SidebarFocused')
+				.next(function() { /* do nothing */ });
 	},
   
 	hide : function() 
 	{
 		if (this.sidebarHidden)
-			this.hidePanel();
+			return this.hidePanel();
 		else
-			this.hideSidebar();
+			return this.hideSidebar();
 	},
 	
 	hidePanel : function() 
 	{
 		if (this.panelHidden)
-			return;
+			return Deferred.next(function() {});
 
 		this.panel.hidePopup();
+
+		return this.waitDOMEvent(this.panel, 'popuphidden');
 	},
  
 	hideSidebar : function() 
 	{
 		if (!this.sidebarHidden)
 			this.window.toggleSidebar(this.lastCommand);
+
+		return Deferred.next(function() {});
 	},
    
 	init : function() 
@@ -674,21 +764,29 @@ EzSidebar.prototype = {
 		this.panel.addEventListener('mouseover', this, true);
 		this.panel.addEventListener('mouseout', this, true);
 		this.sidebarBox.addEventListener('DOMAttrModified', this, false);
-		this.window.addEventListener('focus', this, true);
 		this.autoCollapseButton.addEventListener('command', this, false);
 
 		this.window.addEventListener('load', this, false);
 		this.window.addEventListener('unload', this, false);
 
+		// don't focus to the sidebar contents when I'm switching to a background window!
+		var originalFireSidebarFocusedEvent = this.window.fireSidebarFocusedEvent;
+		this.window.fireSidebarFocusedEvent = function() {
+			if (!EzSidebar.switching)
+				originalFireSidebarFocusedEvent.apply(this, arguments);
+		};
+
 		prefs.addPrefListener(this);
 	},
 	
-	onLoad : function() 
+	initWithDelay : function() 
 	{
 		this.window.removeEventListener('load', this, false);
 
-		if (!this.sidebarHidden)
-			this.showPanel();
+		var self = this;
+		Deferred.next(function() {
+			self.window.addEventListener('activate', self, true);
+		});
 	},
  
 	installStyleSheet : function() 
@@ -752,7 +850,7 @@ EzSidebar.prototype = {
 		this.panel.removeEventListener('mouseover', this, true);
 		this.panel.removeEventListener('mouseout', this, true);
 		this.sidebarBox.removeEventListener('DOMAttrModified', this, false);
-		this.window.removeEventListener('focus', this, true);
+		this.window.removeEventListener('activate', this, true);
 		this.autoCollapseButton.removeEventListener('command', this, false);
 
 		delete this._sidebarBox;
