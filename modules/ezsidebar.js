@@ -207,14 +207,27 @@ EzSidebar.prototype = {
 	},
 	isEventFiredOnClickable : function(aEvent)
 	{
-		var clickable = this.document.evaluate(
+		var doc = aEvent.originalTarget.ownerDocument || aEvent.originalTarget;
+		var clickable = doc.evaluate(
 				'ancestor-or-self::*[contains(" button toolbarbutton scrollbar nativescrollbar popup menupopup panel tooltip splitter textbox ", concat(" ", local-name(), " "))][1]',
 				aEvent.originalTarget,
 				null,
 				Ci.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE,
 				null
 			).singleNodeValue;
-		return !clickable || clickable != this.panel;
+		return clickable && clickable != this.panel;
+	},
+	isEventFiredOnResizer : function(aEvent)
+	{
+		var doc = aEvent.originalTarget.ownerDocument || aEvent.originalTarget;
+		var resizer = doc.evaluate(
+				'ancestor-or-self::*[contains(" resizer ", concat(" ", local-name(), " "))][1]',
+				aEvent.originalTarget,
+				null,
+				Ci.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE,
+				null
+			).singleNodeValue;
+		return resizer == this.resizer;
 	},
 	
 	onMouseDown : function(aEvent) 
@@ -222,10 +235,10 @@ EzSidebar.prototype = {
 		if (this.isEventFiredOnClickable(aEvent))
 			return;
 
-		if (aEvent.currentTarget == this.header)
-			this.startMove(aEvent);
-		else
+		if (this.isEventFiredOnResizer(aEvent))
 			this.startResize(aEvent);
+		else
+			this.startMove(aEvent);
 	},
 	
 	startMove : function(aEvent) 
@@ -402,11 +415,10 @@ EzSidebar.prototype = {
 		this.resizer = this.resizerBar.appendChild(this.document.createElement('resizer'));
 		this.panel.appendChild(this.resizerBar);
 
-		this.header.addEventListener('mousedown', this, false);
 		this.header.addEventListener('dblclick', this, false);
-		this.resizer.addEventListener('mousedown', this, true);
-		this.panel.addEventListener('mousemove', this, false);
-		this.panel.addEventListener('mouseup', this, false);
+		this.panel.addEventListener('mousedown', this, true);
+		this.panel.addEventListener('mousemove', this, true);
+		this.panel.addEventListener('mouseup', this, true);
 		this.panel.addEventListener('popupshown', this, false);
 		this.sidebarBox.addEventListener('DOMAttrModified', this, false);
 		this.window.addEventListener('focus', this, true);
@@ -427,11 +439,10 @@ EzSidebar.prototype = {
 
 		this.window.removeEventListener('unload', this, false);
 
-		this.header.removeEventListener('mousedown', this, false);
 		this.header.removeEventListener('dblclick', this, false);
-		this.resizer.removeEventListener('mousedown', this, true);
-		this.panel.removeEventListener('mousemove', this, false);
-		this.panel.removeEventListener('mouseup', this, false);
+		this.panel.removeEventListener('mousedown', this, true);
+		this.panel.removeEventListener('mousemove', this, true);
+		this.panel.removeEventListener('mouseup', this, true);
 		this.panel.removeEventListener('popupshown', this, false);
 		this.sidebarBox.removeEventListener('DOMAttrModified', this, false);
 		this.window.removeEventListener('focus', this, true);
