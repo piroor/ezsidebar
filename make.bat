@@ -1,3 +1,3 @@
-copy buildscript\make_new.sh .\
-bash make_new.sh ezsidebar version=0
-del make_new.sh
+copy buildscript\makexpi.sh .\
+bash makexpi.sh -n ezsidebar
+del makexpi.sh

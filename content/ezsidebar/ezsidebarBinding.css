@@ -1,6 +1,0 @@
-@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
-
-
-tabbrowser#content {
-	-moz-binding: url('chrome://ezsidebar/content/ezsidebar.xml#dummy-browser');
-}
