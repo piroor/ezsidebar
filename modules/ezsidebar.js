@@ -14,7 +14,7 @@ function EzSidebar(aWindow)
 	aWindow.EzSidebarService = this;
 }
 EzSidebar.prototype = {
-	PREFROOT : 'extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.',
+	domain : 'extensions.{0EAF175C-0C46-4932-AB7D-F45D6C46F367}.',
 	
 	// properties 
 	
@@ -71,41 +71,41 @@ EzSidebar.prototype = {
  
 	get x() 
 	{
-		return prefs.getPref(this.PREFROOT + 'x');
+		return prefs.getPref(this.domain + 'x');
 	},
 	set x(aValue)
 	{
-		prefs.setPref(this.PREFROOT + 'x', aValue);
+		prefs.setPref(this.domain + 'x', aValue);
 		return aValue;
 	},
  
 	get y() 
 	{
-		return prefs.getPref(this.PREFROOT + 'y');
+		return prefs.getPref(this.domain + 'y');
 	},
 	set y(aValue)
 	{
-		prefs.setPref(this.PREFROOT + 'y', aValue);
+		prefs.setPref(this.domain + 'y', aValue);
 		return aValue;
 	},
  
 	get width() 
 	{
-		return prefs.getPref(this.PREFROOT + 'width');
+		return prefs.getPref(this.domain + 'width');
 	},
 	set width(aValue)
 	{
-		prefs.setPref(this.PREFROOT + 'width', aValue);
+		prefs.setPref(this.domain + 'width', aValue);
 		return aValue;
 	},
  
 	get height() 
 	{
-		return prefs.getPref(this.PREFROOT + 'height');
+		return prefs.getPref(this.domain + 'height');
 	},
 	set height(aValue)
 	{
-		prefs.setPref(this.PREFROOT + 'height', aValue);
+		prefs.setPref(this.domain + 'height', aValue);
 		return aValue;
 	},
  
@@ -116,30 +116,16 @@ EzSidebar.prototype = {
  
 	get collapsed() 
 	{
-		return prefs.getPref(this.PREFROOT + 'collapsed');
+		return prefs.getPref(this.domain + 'collapsed');
 	},
 	set collapsed(aValue)
 	{
-		prefs.setPref(this.PREFROOT + 'collapsed', this.resizerBar.collapsed = this.sidebar.collasped = !!aValue);
+		prefs.setPref(this.domain + 'collapsed', this.resizerBar.collapsed = this.sidebar.collasped = !!aValue);
 		return aValue;
 	},
   
-	// observers and listeners 
+	// event handling 
 	
-	observe : function(aSubject, aTopic, aData) 
-	{
-		switch(aTopic)
-		{
-			case 'nsPref:changed':
-				break;
-
-			default:
-				break;
-		}
-	},
-	// for pref listener
-	domain : 'ezsidebar.',
- 
 	handleEvent : function(aEvent) 
 	{
 		switch(aEvent.type)
