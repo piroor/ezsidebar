@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="{0EAF175C-0C46-4932-AB7D-F45D6C46F367}"
                    em:name="Ez Sidebar"
-                   em:version="4.0.2012040600"
+                   em:version="4.0.2012040701"
                    em:creator="SHIMODA Hiroshi"
                    em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."
                    em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html.en">
