@@ -40,10 +40,6 @@ Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
-
-const XULAppInfo = Cc['@mozilla.org/xre/app-info;1']
-					.getService(Ci.nsIXULAppInfo)
-					.QueryInterface(Ci.nsIXULRuntime);
  
 function EzSidebar(aWindow) 
 {
@@ -433,7 +429,7 @@ EzSidebar.prototype = {
 	flip : 1,
 	minWidth : 16,
 	minHeight : 16,
-	requireResizeHeight : XULAppInfo.OS == 'Linux',
+	requireResizeHeight : true,
  
 	onMouseUp : function(aEvent) 
 	{
