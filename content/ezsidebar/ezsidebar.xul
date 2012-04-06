@@ -2,5 +2,11 @@
 <?xml-stylesheet href="chrome://ezsidebar/content/ezsidebar.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://ezsidebar/locale/">
 <overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-<script type="application/javascript" src="chrome://ezsidebar/content/ezsidebar.js"/>
+<script type="application/javascript"><![CDATA[
+(function() {
+	var ns = {};
+	Components.utils.import('resource://ezsidebar-modules/ezsidebar.js', ns);
+	new ns.EzSidebar(window);
+})();
+]]></script>
 </overlay>
