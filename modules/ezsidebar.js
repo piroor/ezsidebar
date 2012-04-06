@@ -239,14 +239,7 @@ EzSidebar.prototype = {
 				return this.updateSize();
 
 			case 'DOMAttrModified':
-				if (aEvent.originalTarget == this.sidebarBox &&
-					(aEvent.attrName == 'hidden' || aEvent.attrName == 'collapsed')) {
-					if (this.sidebarHidden)
-						this.hidePanel();
-					else
-						this.showPanel();
-				}
-				return;
+				return this.onDOMAttrModified(aEvent);
 
 			case 'focus':
 				return this.onFocused();
@@ -406,6 +399,27 @@ EzSidebar.prototype = {
 		aEvent.target.releaseCapture();
 	},
  
+	onDOMAttrModified : function(aEvent) 
+	{
+		if (aEvent.originalTarget != this.sidebarBox)
+			return;
+
+		switch (aEvent.attrName)
+		{
+			case 'hidden':
+			case 'collapsed':
+				if (this.sidebarHidden)
+					this.hidePanel();
+				else
+					this.showPanel();
+				return;
+
+			case 'sidebarcommand':
+				if (aEvent.newValue) EzSidebar.lastCommand = aEvent.newValue;
+				return;
+		}
+	},
+ 
 	onFocused : function() 
 	{
 		if (EzSidebar.hidden || EzSidebar.switching)
@@ -477,7 +491,10 @@ EzSidebar.prototype = {
 			return;
 
 		this.panel.openPopupAtScreen(this.x, this.y, false);
-		EzSidebar.lastCommand = this.lastCommand;
+
+		this.window.setTimeout(function(aSelf) { // with All-in-One Sidebar, we have to do it with delay.
+			EzSidebar.lastCommand = aSelf.lastCommand;
+		}, 0, this);
 	},
 	hidePanel : function()
 	{
