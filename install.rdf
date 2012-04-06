@@ -8,8 +8,7 @@
                    em:version="4.0.2012040600"
                    em:creator="SHIMODA Hiroshi"
                    em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."
-                   em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html.en"
-                   em:optionsURL="chrome://ezsidebar/content/config.xul">
+                   em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html.en">
 
 
     <em:updateURL>http://piro.sakura.ne.jp/xul/update.rdf</em:updateURL>
@@ -19,34 +18,15 @@
     <em:localized>
       <RDF:Description em:locale="en-US"
                        em:name="Ez Sidebar"
-                       em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."
+                       em:description="Provides floating (undocked) Sidebar."
                        em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html.en">
-		<em:translator>lenrock (Polish Language Pack)</em:translator>
-		<em:translator>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:translator>
-		<em:translator>Jean-Bernard Marcon (French Language Pack)</em:translator>
-		<em:translator>George C. Tsoi (Chinese(Simplified) Language Pack)</em:translator>
       </RDF:Description>
     </em:localized>
     <em:localized>
       <RDF:Description em:locale="ja"
                        em:name="イージーSidebar (Ez Sidebar)"
-                       em:description="好きなページをサイドバーパネルに登録したり、サイドバーを別ウィンドウに分離したりできるようにします。"
+                       em:description="サイドバーを別ウィンドウに分離します。"
                        em:homepageURL="http://piro.sakura.ne.jp/xul/_ezsidebar.html">
-		<em:translator>lenrock (Polish Language Pack)</em:translator>
-		<em:translator>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:translator>
-		<em:translator>Jean-Bernard Marcon (French Language Pack)</em:translator>
-		<em:translator>George C. Tsoi (Chinese(Simplified) Language Pack)</em:translator>
-      </RDF:Description>
-    </em:localized>
-    <em:localized>
-      <RDF:Description em:locale="pl-PL"
-                       em:name="Ez Sidebar"
-                       em:description="Allows to take web pages into sidebar panels, and provides undockable Sidebar."
-                       em:homepageURL="http://mozillapl.org/projekty/Dodatki/EZSidebarPL">
-		<em:translator>lenrock (Polish Language Pack)</em:translator>
-		<em:translator>Proyecto NAVE (Espa&#241;ol (Espa&#241;a) Language Pack)</em:translator>
-		<em:translator>Jean-Bernard Marcon (French Language Pack)</em:translator>
-		<em:translator>George C. Tsoi (Chinese(Simplified) Language Pack)</em:translator>
       </RDF:Description>
     </em:localized>
 

@@ -4,8 +4,5 @@ overlay	chrome://browser/content/browser.xul	chrome://ezsidebar/content/ezsideba
 
 locale	ezsidebar	en-US	jar:chrome/ezsidebar.jar!/locale/en-US/ezsidebar/
 locale	ezsidebar	ja	jar:chrome/ezsidebar.jar!/locale/ja/ezsidebar/
-locale	ezsidebar	sk-SK	jar:chrome/ezsidebar.jar!/locale/sk-SK/ezsidebar/
-locale	ezsidebar	hu-HU	jar:chrome/ezsidebar.jar!/locale/hu-HU/ezsidebar/
-locale	ezsidebar	it-IT	jar:chrome/ezsidebar.jar!/locale/it-IT/ezsidebar/
 
 resource ezsidebar-modules modules/
