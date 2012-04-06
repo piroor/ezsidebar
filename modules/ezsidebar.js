@@ -786,6 +786,8 @@ EzSidebar.prototype = {
 		var self = this;
 		Deferred.next(function() {
 			self.window.addEventListener('activate', self, true);
+
+			self.onActivated();
 		});
 	},
  
