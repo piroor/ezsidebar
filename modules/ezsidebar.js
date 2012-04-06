@@ -205,9 +205,23 @@ EzSidebar.prototype = {
 				break;
 		}
 	},
+	isEventFiredOnClickable : function(aEvent)
+	{
+		var clickable = this.document.evaluate(
+				'ancestor-or-self::*[contains(" button toolbarbutton scrollbar nativescrollbar popup menupopup panel tooltip splitter textbox ", concat(" ", local-name(), " "))][1]',
+				aEvent.originalTarget,
+				null,
+				Ci.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE,
+				null
+			).singleNodeValue;
+		return !clickable || clickable != this.panel;
+	},
 	
 	onMouseDown : function(aEvent) 
 	{
+		if (this.isEventFiredOnClickable(aEvent))
+			return;
+
 		if (aEvent.currentTarget == this.header)
 			this.startMove(aEvent);
 		else
