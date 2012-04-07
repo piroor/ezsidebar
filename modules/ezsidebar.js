@@ -483,13 +483,21 @@ EzSidebar.prototype = {
  
 	onPopupShown : function(aEvent) 
 	{
+		if (aEvent.target != this.panel)
+			return;
 		this.panel.popupBoxObject.setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_NO_CONSUME);
+		// for Aero Glass on Windows
+		// (see http://www.xuldev.org/blog/?p=439)
 		this.panel.collapsed = false;
 		this.updateSize();
 	},
  
 	onPopupHiding : function(aEvent) 
 	{
+		if (aEvent.target != this.panel)
+			return;
+		// for Aero Glass on Windows
+		// (see http://www.xuldev.org/blog/?p=439)
 		this.panel.collapsed = true;
 	},
  
