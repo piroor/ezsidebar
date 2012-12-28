@@ -1,4 +1,4 @@
-// Usage:: var Deferred = require('..../jsdeferred.bootstrap.js');
+// Usage:: Components.utils.import('..../jsdeferred.jscodemodule.js');
 // JSDeferred 0.4.0 Copyright (c) 2007 cho45 ( www.lowreal.net )
 // See http://github.com/cho45/jsdeferred
 var EXPORTED_SYMBOLS = ["Deferred"];
@@ -413,45 +413,44 @@ Deferred.postie_for_message_manager = function (manager) {
 		};
 	manager.addMessageListener(postieId+':response', messageListener);
 
-	manager.loadFrameScript('data:application/javascript,'+encodeURIComponent(<![CDATA[
-		(function(_global) {
-			var [Deferred, timers] = %JSDEFERRED%();
-			var _onMessage = function (message) {
-					switch (message.name) {
-						case '%ID%:request':
-							var data = { id : message.json.id }
-							Deferred
-								.next(function () {
-									return eval(message.json.code);
-								})
-								.next(function (value) {
-									data.value = value;
-									sendAsyncMessage('%ID%:response', data);
-								})
-								.error(function (error) {
-									data.error = error;
-									sendAsyncMessage('%ID%:response', data);
-								});
-							break;
+	manager.loadFrameScript('data:application/javascript,'+encodeURIComponent(
+		('(function(_global) {' +
+		'  var [Deferred, timers] = %JSDEFERRED%();' +
+		'  var _onMessage = function (message) {' +
+		'      switch (message.name) {' +
+		'        case "%ID%:request":' +
+		'          var data = { id : message.json.id }' +
+		'          Deferred' +
+		'            .next(function () {' +
+		'              return eval(message.json.code);' +
+		'            })' +
+		'            .next(function (value) {' +
+		'              data.value = value;' +
+		'              sendAsyncMessage("%ID%:response", data);' +
+		'            })' +
+		'            .error(function (error) {' +
+		'              data.error = error;' +
+		'              sendAsyncMessage("%ID%:response", data);' +
+		'            });' +
+		'          break;' +
 
-						case '%ID%:destroy':
-							removeMessageListener('%ID%:request', onMessage);
-							removeMessageListener('%ID%:destroy', onMessage);
-							timers.forEach(function(aTimer) {
-								aTimer.cancel();
-							});
-							timers = undefined;
-							_onMessage = undefined;
-							_global = undefined;
-							Deferred = undefined;
-							break;
-					}
-				};
-			addMessageListener('%ID%:request', _onMessage);
-			addMessageListener('%ID%:destroy', _onMessage);
-			sendAsyncMessage('%ID%:response', { id : -1, init : true });
-		})(this);
-	]]>.toString()
+		'        case "%ID%:destroy":' +
+		'          removeMessageListener("%ID%:request", onMessage);' +
+		'          removeMessageListener("%ID%:destroy", onMessage);' +
+		'          timers.forEach(function(aTimer) {' +
+		'            aTimer.cancel();' +
+		'          });' +
+		'          timers = undefined;' +
+		'          _onMessage = undefined;' +
+		'          _global = undefined;' +
+		'          Deferred = undefined;' +
+		'          break;' +
+		'      }' +
+		'    };' +
+		'  addMessageListener("%ID%:request", _onMessage);' +
+		'  addMessageListener("%ID%:destroy", _onMessage);' +
+		'  sendAsyncMessage("%ID%:response", { id : -1, init : true });' +
+		'})(this);')
 		.replace(/%ID%/g, postieId)
 		.replace(/%JSDEFERRED%/, D.toSource())
 	), false);
@@ -499,15 +498,3 @@ return [Deferred, timers];
 }
 
 var [Deferred, timers] = D();
-
-function shutdown()
-{
-	timers.forEach(function(aTimer) {
-		aTimer.cancel();
-	});
-	timers = undefined;
-	Deferred = undefined;
-}
-
-exports = {};
-Deferred.define(exports);

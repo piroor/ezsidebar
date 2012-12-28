@@ -803,27 +803,27 @@ EzSidebar.prototype = {
 	{
 		this.uninstallStyleSheet();
 
-		var style = <![CDATA[
-				#ezsidebar-resizer-left,
-				#ezsidebar-resizer-right,
-				#ezsidebar-resizer-top-left,
-				#ezsidebar-resizer-top-right,
-				#ezsidebar-resizer-bottom-left,
-				#ezsidebar-resizer-bottom-right {
-					width: %SIZE%px;
-				}
-				#ezsidebar-resizer-top,
-				#ezsidebar-resizer-bottom,
-				#ezsidebar-resizer-top-left,
-				#ezsidebar-resizer-top-right,
-				#ezsidebar-resizer-bottom-left,
-				#ezsidebar-resizer-bottom-right {
-					height: %SIZE%px;
-				}
-				#ezsidebar-resizer-outer-container {
-					margin:-%SIZE%px;
-				}
-			]]>.toString().replace(/%SIZE%/g, this.resizeArea);
+		var style = (
+			'#ezsidebar-resizer-left,\n' +
+			'#ezsidebar-resizer-right,\n' +
+			'#ezsidebar-resizer-top-left,\n' +
+			'#ezsidebar-resizer-top-right,\n' +
+			'#ezsidebar-resizer-bottom-left,\n' +
+			'#ezsidebar-resizer-bottom-right {\n' +
+			'	width: ' + this.resizeArea + 'px;\n' +
+			'}\n' +
+			'#ezsidebar-resizer-top,\n' +
+			'#ezsidebar-resizer-bottom,\n' +
+			'#ezsidebar-resizer-top-left,\n' +
+			'#ezsidebar-resizer-top-right,\n' +
+			'#ezsidebar-resizer-bottom-left,\n' +
+			'#ezsidebar-resizer-bottom-right {\n' +
+			'	height: ' + this.resizeArea + 'px;\n' +
+			'}\n' +
+			'#ezsidebar-resizer-outer-container {\n' +
+			'	margin:-' + this.resizeArea + 'px;\n' +
+			'}'
+		);
 		this.lastStyleSheet = this.document.createProcessingInstruction('xml-stylesheet',
 			'type="text/css" href="data:text/css,'+encodeURIComponent(style)+'"');
 		this.document.insertBefore(this.lastStyleSheet, this.document.documentElement);
