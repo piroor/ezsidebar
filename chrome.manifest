@@ -1,8 +1,8 @@
-content	ezsidebar	jar:chrome/ezsidebar.jar!/content/ezsidebar/
+content	ezsidebar	content/ezsidebar/
 
 overlay	chrome://browser/content/browser.xul	chrome://ezsidebar/content/ezsidebar.xul
 
-locale	ezsidebar	en-US	jar:chrome/ezsidebar.jar!/locale/en-US/ezsidebar/
-locale	ezsidebar	ja	jar:chrome/ezsidebar.jar!/locale/ja/ezsidebar/
+locale	ezsidebar	en-US	locale/en-US/ezsidebar/
+locale	ezsidebar	ja	locale/ja/ezsidebar/
 
 resource ezsidebar-modules modules/
