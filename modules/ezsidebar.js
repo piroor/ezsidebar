@@ -217,6 +217,11 @@ EzSidebar.prototype = {
 		return aValue;
 	},
  
+	get MutationObserver()
+	{
+		return this.window.MutationObserver || this.window.MozMutationObserver;
+	},
+ 
 	waitDOMEvent : function(aTarget)
 	{
 		var deferred = new Deferred();
@@ -544,6 +549,35 @@ EzSidebar.prototype = {
 	},
 	_autoCollapseTimer : null,
  
+	// callback for MutationObserver
+	handleMutations : function(aMutations, aObserver) 
+	{
+		aMutations.forEach(function(aMutation) {
+			switch (aMutation.type)
+			{
+				case 'attributes':
+					switch (aMutation.attributeName)
+					{
+						case 'hidden':
+						case 'collapsed':
+							if (this.sidebarHidden)
+								this.hidePanel();
+							else
+								this.showPanel();
+							return;
+
+						case 'sidebarcommand':
+							let (newValue = aMutation.target.getAttribute('sidebarcommand')) {
+								if (newValue) EzSidebar.lastCommand = newValue;
+							}
+							return;
+					}
+					break;
+			}
+		}, this);
+	},
+ 
+	// failsafe for environments which have no MutationObserver
 	onDOMAttrModified : function(aEvent) 
 	{
 		if (aEvent.originalTarget != this.sidebarBox)
@@ -771,8 +805,12 @@ EzSidebar.prototype = {
 		this.panel.addEventListener('popuphiding', this, false);
 		this.panel.addEventListener('mouseover', this, true);
 		this.panel.addEventListener('mouseout', this, true);
-		this.sidebarBox.addEventListener('DOMAttrModified', this, false);
 		this.autoCollapseButton.addEventListener('command', this, false);
+
+		if (this.MutationObserver)
+			this.initMutationObserver();
+		else
+			this.sidebarBox.addEventListener('DOMAttrModified', this, false);
 
 		this.window.addEventListener('load', this, false);
 		this.window.addEventListener('unload', this, false);
@@ -785,6 +823,14 @@ EzSidebar.prototype = {
 		};
 
 		prefs.addPrefListener(this);
+	},
+	initMutationObserver : function()
+	{
+		var self = this;
+		this.mutationObserver = new this.MutationObserver(function(aMutations, aObserver) {
+			self.handleMutations(aMutations, aObserver);
+		});
+		this.mutationObserver.observe(this.sidebarBox, { attributes : true });
 	},
 	
 	initWithDelay : function() 
@@ -859,9 +905,13 @@ EzSidebar.prototype = {
 		this.panel.removeEventListener('popuphiding', this, false);
 		this.panel.removeEventListener('mouseover', this, true);
 		this.panel.removeEventListener('mouseout', this, true);
-		this.sidebarBox.removeEventListener('DOMAttrModified', this, false);
 		this.window.removeEventListener('activate', this, true);
 		this.autoCollapseButton.removeEventListener('command', this, false);
+
+		if (this.MutationObserver)
+			this.destroyMutationObserver();
+		else
+			this.sidebarBox.removeEventListener('DOMAttrModified', this, false);
 
 		delete this._sidebarBox;
 		delete this._sidebar;
@@ -874,7 +924,12 @@ EzSidebar.prototype = {
 
 		var index = EzSidebar.instances.indexOf(this);
 		EzSidebar.instances.splice(index, 1);
-	}
+	},
+	destroyMutationObserver : function()
+	{
+		this.mutationObserver.disconnect();
+		delete this.mutationObserver;
+	},
  
 }; 
  
