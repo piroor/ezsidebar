@@ -784,6 +784,8 @@ EzSidebar.prototype = {
    
 	init : function() 
 	{
+		this.window.EzSidebar = this;
+
 		this.window.removeEventListener('DOMContentLoaded', this, false);
 
 		var sidebarBox = this.sidebarBox;
@@ -886,6 +888,8 @@ EzSidebar.prototype = {
   
 	destroy : function() 
 	{
+		delete this.window.EzSidebar;
+
 		if (this.browserWindows.length == 1 && !EzSidebar.panelHidden)
 			EzSidebar.shouldShowForLastWindow = true;
 
