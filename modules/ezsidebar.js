@@ -792,6 +792,15 @@ EzSidebar.prototype = {
 		this.document.getElementById('ezsidebar-resizer-container').appendChild(sidebarBox); // this automatically removes the box from the document tree and inserts under the panel
 		sidebarBox.setAttribute('flex', 1); // required to expand panel contents
 
+		// show the panel once to call XBL constructor
+		var self = this;
+		this.panel.style.visibility = 'hidden';
+		this.panel.openPopupAtScreen(-99999, -99999, false);
+		this.waitDOMEvent(this.panel, 'popupshown').next(function() {
+			self.panel.hidePopup();
+			self.panel.style.visibility = '';
+		});
+
 		if (this.glass)
 			this.panel.setAttribute('glass', true);
 		else
