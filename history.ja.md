@@ -1,5 +1,8 @@
 # 更新履歴
 
+ - master/HEAD
+   * 起動直後に「sidebar.contentDocument is undefined」エラーが出ないようにした
+   * jarファイルを含めない形のパッケージングに変更
  - 4.0.2012122902
    * サイドバーの状態をMutationObserverで非同期に更新するようにした
  - 4.0.2012122901

@@ -1,5 +1,8 @@
 # History
 
+ - master/HEAD
+   * Fixed: Suppress "sidebar.contentDocument is undefined" error on the initial showing.
+   * Modified: "jar" archive is no longer included.
  - 4.0.2012122902
    * Improved: Floating sidebar is updated asynchronously based on MutationObserver.
  - 4.0.2012122901
