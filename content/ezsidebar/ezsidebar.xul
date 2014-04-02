@@ -10,6 +10,7 @@
 
 <popupset id="mainPopupSet">
 	<panel id="ezsidebar-panel"
+		glass="true"
 		collapsed="true"
 		noautofocus="true"
 		noautohide="true"
