@@ -490,7 +490,7 @@ EzSidebar.prototype = {
 	{
 		if (aEvent.target != this.panel)
 			return;
-		this.panel.popupBoxObject.setConsumeRollupEvent(Ci.nsIPopupBoxObject.ROLLUP_NO_CONSUME);
+		this.panel.popupBoxObject.setConsumeRollupEvent(this.panel.popupBoxObject.ROLLUP_NO_CONSUME);
 		// for Aero Glass on Windows
 		// (see http://www.xuldev.org/blog/?p=439)
 		this.panel.collapsed = false;
