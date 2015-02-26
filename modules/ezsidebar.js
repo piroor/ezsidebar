@@ -570,7 +570,8 @@ EzSidebar.prototype = {
 							return;
 
 						case 'sidebarcommand':
-							let (newValue = aMutation.target.getAttribute('sidebarcommand')) {
+							{
+								let newValue = aMutation.target.getAttribute('sidebarcommand');
 								if (newValue) EzSidebar.lastCommand = newValue;
 							}
 							return;
