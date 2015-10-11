@@ -33,7 +33,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
  
-const EXPORTED_SYMBOLS = ['EzSidebar']; 
+var EXPORTED_SYMBOLS = ['EzSidebar']; 
 
 Components.utils.import('resource://ezsidebar-modules/prefs.js');
 Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
