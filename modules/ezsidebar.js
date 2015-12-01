@@ -14,7 +14,7 @@
  * The Original Code is Ez Sidebar.
  *
  * The Initial Developer of the Original Code is Fox Splitter.
- * Portions created by the Initial Developer are Copyright (C) 2003-2012
+ * Portions created by the Initial Developer are Copyright (C) 2003-2015
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):: YUKI "Piro" Hiroshi <piro.outsider.reflex@gmail.com>
@@ -35,9 +35,12 @@
  
 var EXPORTED_SYMBOLS = ['EzSidebar']; 
 
+Components.utils.import('resource://gre/modules/XPCOMUtils.jsm');
+XPCOMUtils.defineLazyModuleGetter(this, 'Timer', 'resource://gre/modules/Timer.jsm');
+XPCOMUtils.defineLazyModuleGetter(this, 'Promise', 'resource://gre/modules/Promise.jsm');
+
 Components.utils.import('resource://ezsidebar-modules/prefs.js');
 Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
-Components.utils.import('resource://ezsidebar-modules/jsdeferred.js');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
@@ -45,7 +48,7 @@ const Ci = Components.interfaces;
 const XULAppInfo = Cc['@mozilla.org/xre/app-info;1']
 					.getService(Ci.nsIXULAppInfo)
 					.QueryInterface(Ci.nsIXULRuntime);
- 
+
 function EzSidebar(aWindow) 
 {
 	this.window = aWindow;
@@ -224,15 +227,15 @@ EzSidebar.prototype = {
  
 	waitDOMEvent : function(aTarget)
 	{
-		var deferred = new Deferred();
+		return new Promise((function(aResolve, aReject) {
 		var eventTypes = Array.slice(arguments, 1);
 
 		var handleEvent = function(aEvent) {
 				eventTypes.forEach(function(aType) {
 					aTarget.removeEventListener(aType, handleEvent, true);
 				});
-				if (timer) timer.cancel();
-				deferred.call();
+				if (timer) clearTimeout(timer);
+				aResolve();
 			};
 
 		eventTypes.forEach(function(aType) {
@@ -240,15 +243,17 @@ EzSidebar.prototype = {
 		});
 
 		// timeout (for safety)
-		let timer = Deferred.wait(0.5);
-		timer
-			.next(function() {
-				timer = null;
+		let timer = setTimeout((function() {
+			timer = null;
+			try {
 				handleEvent();
-			})
-			.error(this.defaultHandleError);
+			}
+			catch(e) {
+				this.defaultHandleError(e);
+			}
+		}).bind(this), 500);
 
-		return deferred;
+		}).bind(this));
 	},
   
 	// event handling 
@@ -278,9 +283,9 @@ EzSidebar.prototype = {
 			case 'height':
 				if (!this.panelHidden) {
 					if (this._updateSizeAndPositionTimer)
-						this._updateSizeAndPositionTimer.cancel();
+						clearTimeout(this._updateSizeAndPositionTimer);
 					let self = this;
-					this._updateSizeAndPositionTimer = Deferred.next(function() {
+					this._updateSizeAndPositionTimer = setTimeout(function() {
 						self._updateSizeAndPositionTimer = null;
 						self.updateSize();
 						self.panel.moveTo(self.x, self.y);
@@ -429,7 +434,7 @@ EzSidebar.prototype = {
 			this.panel.moveTo(this.x = this.baseX + dX,
 								this.y = this.baseY + dY);
 			let self = this;
- 			Deferred.next(function() { self.repositioning = false; });
+ 			setTimeout(function() { self.repositioning = false; }, 0);
 		}
 		else if (this.resizing) {
 			this.repositioning = true;
@@ -468,7 +473,7 @@ EzSidebar.prototype = {
 			}
 
 			let self = this;
- 			Deferred.next(function() { self.repositioning = false; });
+ 			setTimeout(function() { self.repositioning = false; }, 0);
 		}
 	},
 	flip : 1,
@@ -516,13 +521,11 @@ EzSidebar.prototype = {
 			return;
 
 		var self = this;
-		this._autoExpandTimer = Deferred
-			.wait(prefs.getPref(this.domain + 'autoCollapse.delay.expand') / 1000)
-			.next(function() {
-				self._autoExpandTimer = null;
-				if (self.hover && self.collapsed)
-					self.toggleCollapsed();
-			});
+		this._autoExpandTimer = setTimeout(function() {
+			self._autoExpandTimer = null;
+			if (self.hover && self.collapsed)
+				self.toggleCollapsed();
+		}, prefs.getPref(this.domain + 'autoCollapse.delay.expand'));
 	},
 	_autoExpandTimer : null,
  
@@ -533,22 +536,20 @@ EzSidebar.prototype = {
 			return;
 
 		var self = this;
-		Deferred.next(function() {
+		setTimeout(function() {
 			if (!self.hover && self._autoExpandTimer) {
-				self._autoExpandTimer.cancel();
+				clearTimeout(self._autoExpandTimer);
 				self._autoExpandTimer = null;
 			}
-		}, 0, this);
+		}, 0);
 
 		if (this._autoCollapseTimer)
-			this._autoCollapseTimer.cancel();
-		this._autoCollapseTimer = Deferred
-			.wait(prefs.getPref(this.domain + 'autoCollapse.delay.collapse') / 1000)
-			.next(function() {
-				self._autoCollapseTimer = null;
-				if (!self.hover && !self.collapsed)
-					self.toggleCollapsed();
-			});
+			clearTimeout(this._autoCollapseTimer);
+		this._autoCollapseTimer = setTimeout(function() {
+			self._autoCollapseTimer = null;
+			if (!self.hover && !self.collapsed)
+				self.toggleCollapsed();
+		}, prefs.getPref(this.domain + 'autoCollapse.delay.collapse'));
 	},
 	_autoCollapseTimer : null,
  
@@ -624,7 +625,7 @@ EzSidebar.prototype = {
 
 		var self = this;
 		this.show()
-			.next(function() {
+			.then(function() {
 				// now the panel is showing...
 				focusedWindow = {};
 				focusedElement = fm.getFocusedElementForWindow(current, true, focusedWindow);
@@ -634,23 +635,23 @@ EzSidebar.prototype = {
 							Ci.nsIFocusManager.FLAG_NOSWITCHFRAME |
 							reason;
 			})
-			.next(function() {
+			.then(function() {
 				// completely shown.
-				var deferreds = [];
+				var promises = [];
 				self.browserWindows.forEach(function(aWindow) {
 					if (aWindow != current)
-						deferreds.push(aWindow.EzSidebarService.hide());
+						promises.push(aWindow.EzSidebarService.hide());
 				}, this);
 
 				focusedWindow.value.focus();
 
-				if (deferreds.length)
-					return Deferred.parallel(deferreds);
+				if (promises.length > 0)
+					return Promise.all(promises);
 			})
-			.error(function(e) {
+			.catch(function(e) {
 				dump(e+'\n'+e.stack+'\n');
 			})
-			.next(function() {
+			.then(function() {
 				if (focusedElement)
 					fm.setFocus(focusedElement, flags);
 
@@ -735,17 +736,17 @@ EzSidebar.prototype = {
 	showPanel : function() 
 	{
 		if (!this.panelHidden)
-			return Deferred.next(function() {});
+			return Promise.resolve();
 
 		this.collapsed = this.collapsed;
 		this.updateAutoCollapseButton();
 		this.panel.openPopupAtScreen(this.x, this.y, false);
 
 		var self = this;
-		Deferred.next(function() { // with All-in-One Sidebar, we have to do it with delay.
+		setTimeout(function() { // with All-in-One Sidebar, we have to do it with delay.
 			if (self.lastCommand)
 				EzSidebar.lastCommand = self.lastCommand;
-		});
+		}, 0);
 
 		return this.waitDOMEvent(this.panel, 'popupshown');
 	},
@@ -753,12 +754,12 @@ EzSidebar.prototype = {
 	showSidebar : function() 
 	{
 		if (!this.sidebarHidden)
-			return Deferred.next(function() {});
+			return Promise.resolve();
 
 		this.window.toggleSidebar(EzSidebar.lastCommand || prefs.getPref(this.domain + 'defaultCommand'));
 
 		return this.waitDOMEvent(this.sidebar, 'load', 'SidebarFocused')
-				.next(function() { /* do nothing */ });
+				.then(function() { /* do nothing */ });
 	},
   
 	hide : function() 
@@ -772,7 +773,7 @@ EzSidebar.prototype = {
 	hidePanel : function() 
 	{
 		if (this.panelHidden)
-			return Deferred.next(function() {});
+			return Promise.resolve();
 
 		this.panel.hidePopup();
 
@@ -784,7 +785,7 @@ EzSidebar.prototype = {
 		if (!this.sidebarHidden)
 			this.window.toggleSidebar(this.lastCommand);
 
-		return Deferred.next(function() {});
+		return Promise.resolve();
 	},
    
 	init : function() 
@@ -801,7 +802,7 @@ EzSidebar.prototype = {
 		var self = this;
 		this.panel.style.visibility = 'hidden';
 		this.panel.openPopupAtScreen(-99999, -99999, false);
-		this.waitDOMEvent(this.panel, 'popupshown').next(function() {
+		this.waitDOMEvent(this.panel, 'popupshown').then(function() {
 			self.panel.hidePopup();
 			self.panel.style.visibility = '';
 		});
@@ -854,11 +855,11 @@ EzSidebar.prototype = {
 		this.window.removeEventListener('load', this, false);
 
 		var self = this;
-		Deferred.next(function() {
+		setTimeout(function() {
 			self.window.addEventListener('activate', self, true);
 
 			self.onActivated();
-		});
+		}, 0);
 	},
  
 	installStyleSheet : function() 
