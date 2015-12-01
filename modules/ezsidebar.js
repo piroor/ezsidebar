@@ -36,11 +36,10 @@
 var EXPORTED_SYMBOLS = ['EzSidebar']; 
 
 Components.utils.import('resource://gre/modules/XPCOMUtils.jsm');
-XPCOMUtils.defineLazyModuleGetter(this, 'Timer', 'resource://gre/modules/Timer.jsm');
-XPCOMUtils.defineLazyModuleGetter(this, 'Promise', 'resource://gre/modules/Promise.jsm');
-
-Components.utils.import('resource://ezsidebar-modules/prefs.js');
+Components.utils.import('resource://gre/modules/Timer.jsm');
 Components.utils.import('resource://ezsidebar-modules/namespace.jsm');
+XPCOMUtils.defineLazyModuleGetter(this, 'Promise', 'resource://gre/modules/Promise.jsm');
+XPCOMUtils.defineLazyModuleGetter(this, 'prefs', 'resource://ezsidebar-modules/prefs.js');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
