@@ -1,6 +1,8 @@
 # 更新履歴
 
  - master/HEAD
+ - 4.0.2016031101
+   * Nightly 48.0a1での動作を確認
    * 起動直後に「sidebar.contentDocument is undefined」エラーが出ないようにした
    * jarファイルを含めない形のパッケージングに変更
  - 4.0.2012122902

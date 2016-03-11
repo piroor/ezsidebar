@@ -1,6 +1,8 @@
 # History
 
  - master/HEAD
+ - 4.0.2016031101
+   * Works on Nightly 48.0a1.
    * Fixed: Suppress "sidebar.contentDocument is undefined" error on the initial showing.
    * Modified: "jar" archive is no longer included.
  - 4.0.2012122902
